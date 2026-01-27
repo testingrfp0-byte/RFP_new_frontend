@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTheme } from "../../contexts/ThemeContext";
 import { useDispatch, useSelector } from "react-redux";
 import { Send, Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
@@ -27,7 +28,7 @@ import {
     fetchFilterQuestionsRequest,
 } from "../../features/modules/questions/questionsSlice";
 
-const ReviewerQuestionCard = ({ question, isDarkMode }) => {
+const ReviewerAnswerEditor = ({ question, isDarkMode }) => {
     const dispatch = useDispatch();
 
     const isEditing = useSelector(selectIsEditing(question.question_id));
@@ -150,6 +151,7 @@ const ReviewerQuestionCard = ({ question, isDarkMode }) => {
 
     const handleNotForMe = () => {
         dispatch(notForMeRequest(question.question_id));
+        toast.success("Marked as Not for Me");
     };
 
     const handleAnalyzeQuestion = () => {
@@ -186,14 +188,14 @@ const ReviewerQuestionCard = ({ question, isDarkMode }) => {
         setShowVersionDropdown((prev) => !prev);
     };
 
-    const handleTextareaClick = () => {
+    const handleLocalTextareaClick = () => {
         if (!isEditing) {
             dispatch(fetchVersionsRequest(question.question_id));
         }
     };
 
     return (
-        <div>
+        <div className="space-y-4">
             <div className="mb-4">
                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
                     Your Response:
@@ -207,7 +209,7 @@ const ReviewerQuestionCard = ({ question, isDarkMode }) => {
                     rows={8}
                     value={localAnswer}
                     onChange={(e) => handleLocalAnswerChange(e.target.value)}
-                    onClick={handleTextareaClick}
+                    onClick={handleLocalTextareaClick}
                     disabled={!isEditing || manualSaved}
                 />
             </div>
@@ -215,7 +217,7 @@ const ReviewerQuestionCard = ({ question, isDarkMode }) => {
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-3 items-center">
                 {/* Case 1: No answer generated yet - Show ONLY Generate & Not for me */}
-                {question.is_submitted === false && question.answer_id === null && (
+                {question.is_submitted === false && (question.answer_id === null && (!question.answer || question.answer.trim() === "")) && (
                     <>
                         <button
                             onClick={handleGenerateAnswer}
@@ -322,7 +324,7 @@ const ReviewerQuestionCard = ({ question, isDarkMode }) => {
                 )}
 
                 {/* Case 3: Answer generated, status is "process" - Show all action buttons */}
-                {question.answer_id !== null && question.submit_status === "process" && !chatPromptSaved && (
+                {((question.answer_id !== null) || (question.answer && question.answer.trim() !== "")) && question.submit_status === "process" && !chatPromptSaved && (
                     <>
                         <button
                             onClick={handleGenerateAnswer}
@@ -656,4 +658,4 @@ const ReviewerQuestionCard = ({ question, isDarkMode }) => {
     );
 };
 
-export default ReviewerQuestionCard;
+export default ReviewerAnswerEditor;

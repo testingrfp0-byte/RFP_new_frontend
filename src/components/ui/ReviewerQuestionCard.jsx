@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ReviewerQuestionCard from '../../pages/dashboard/ReviewerAnswerEditor';
+import ReviewerAnswerEditor from '../../pages/dashboard/ReviewerAnswerEditor';
 import AssignmentControls from '../../pages/list/AssignmentControls';
 
 const QuestionCard = ({
@@ -72,7 +72,7 @@ const QuestionCard = ({
             }`}
         >
           {isReviewerMode ? (
-            <ReviewerQuestionCard question={question} isDarkMode={isDarkMode} />
+            <ReviewerAnswerEditor question={question} isDarkMode={isDarkMode} />
           ) : isAdminMode ? (
             <AssignmentControls
               question={question}
