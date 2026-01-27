@@ -1,0 +1,13 @@
+export const FETCH_KEYSTONE_REQUEST = "keystone/FETCH_REQUEST";
+export const FETCH_KEYSTONE_SUCCESS = "keystone/FETCH_SUCCESS";
+export const FETCH_KEYSTONE_FAILURE = "keystone/FETCH_FAILURE";
+
+export const UPLOAD_KEYSTONE_REQUEST = "keystone/UPLOAD_REQUEST";
+export const UPLOAD_KEYSTONE_SUCCESS = "keystone/UPLOAD_SUCCESS";
+export const UPLOAD_KEYSTONE_FAILURE = "keystone/UPLOAD_FAILURE";
+
+export const DELETE_KEYSTONE_REQUEST = "keystone/DELETE_REQUEST";
+export const DELETE_KEYSTONE_SUCCESS = "keystone/DELETE_SUCCESS";
+export const DELETE_KEYSTONE_FAILURE = "keystone/DELETE_FAILURE";
+
+export const VIEW_KEYSTONE_REQUEST = "keystone/VIEW_REQUEST";

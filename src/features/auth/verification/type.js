@@ -1,0 +1,2 @@
+export const VERIFY_OTP_REQUEST = "auth/VERIFY_OTP_REQUEST";
+export const RESEND_OTP_REQUEST = "auth/RESEND_OTP_REQUEST";

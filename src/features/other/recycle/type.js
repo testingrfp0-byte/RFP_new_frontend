@@ -1,0 +1,3 @@
+export const FETCH_TRASH_REQUEST = "recycleBin/FETCH_TRASH_REQUEST";
+export const RESTORE_TRASH_REQUEST = "recycleBin/RESTORE_TRASH_REQUEST";
+export const DELETE_TRASH_REQUEST = "recycleBin/DELETE_TRASH_REQUEST";

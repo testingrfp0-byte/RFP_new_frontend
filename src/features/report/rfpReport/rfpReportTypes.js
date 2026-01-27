@@ -1,0 +1,7 @@
+export const FETCH_RFP_DOCS_REQUEST = "rfpReport/FETCH_DOCS_REQUEST";
+export const FETCH_RFP_DOCS_SUCCESS = "rfpReport/FETCH_DOCS_SUCCESS";
+export const FETCH_RFP_DOCS_FAILURE = "rfpReport/FETCH_DOCS_FAILURE";
+
+export const DELETE_RFP_DOC_REQUEST = "rfpReport/DELETE_DOC_REQUEST";
+export const DELETE_RFP_DOC_SUCCESS = "rfpReport/DELETE_DOC_SUCCESS";
+export const DELETE_RFP_DOC_FAILURE = "rfpReport/DELETE_DOC_FAILURE";
