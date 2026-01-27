@@ -7,24 +7,31 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     const session = localStorage.getItem("session");
+
     if (session) {
       const parsedSession = JSON.parse(session);
-      if (parsedSession.user && parsedSession.user.image_url) {
-        setUserProfileImage(parsedSession.user.image_url);
+
+      if (parsedSession.user && parsedSession.user.image_base64) {
+        setUserProfileImage(parsedSession.user.image_base64);
       }
     }
   }, []);
 
-  const updateProfileImage = (imageUrl) => {
-    setUserProfileImage(imageUrl);
+  const updateProfileImage = (imageBase64) => {
+    setUserProfileImage(imageBase64);
 
     const session = localStorage.getItem("session");
     if (session) {
       const parsedSession = JSON.parse(session);
+
       const updatedSession = {
         ...parsedSession,
-        user: { ...parsedSession.user, image_url: imageUrl },
+        user: {
+          ...parsedSession.user,
+          image_base64: imageBase64,
+        },
       };
+
       localStorage.setItem("session", JSON.stringify(updatedSession));
     }
   };

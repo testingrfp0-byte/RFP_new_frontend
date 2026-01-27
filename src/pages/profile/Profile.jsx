@@ -14,10 +14,12 @@ import {
 import ToasterNotification from "../../components/ui/ToasterNotification";
 import LoadingSpinner from "../../components/ui/LoadingSpinner";
 import { toast } from "react-toastify";
+import { useUser } from "../../contexts/UserContext";
 
 const Profile = () => {
   const { isDarkMode } = useTheme();
   const dispatch = useDispatch();
+  const { updateProfileImage } = useUser();
 
   const { loading, data: user } = useSelector(
     (state) => state.profile
@@ -86,15 +88,18 @@ const Profile = () => {
     if (success) {
       setIsEditing(false);
       setImageFile(null);
+
       toast.success("Profile updated successfully!", {
         position: "top-right",
         autoClose: 3000,
       });
 
-      // Don't reload here - let the saga handle it
-      // The isInitialLoad flag will prevent the full-page loader
+      if (user?.image_base64) {
+        updateProfileImage(user.image_base64);
+      }
+
     }
-  }, [success]);
+  }, [success, user, updateProfileImage]);
 
   useEffect(() => {
     if (updateError) {

@@ -113,9 +113,9 @@ const DocumentLibrary = ({
         {documents.map((doc) => (
           <div
             key={doc.id}
-            className={`rounded-lg p-4 cursor-pointer transition-all border
+            className={`rounded-lg p-4 cursor-pointer transition-all duration-300 border
     ${selectedDocument?.id === doc.id
-                ? 'border-purple-500 shadow-lg'
+                ? 'border-4 border-purple-500 shadow-lg'
                 : isDarkMode
                   ? 'border-gray-600'
                   : 'border-gray-200'
