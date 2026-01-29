@@ -16,6 +16,18 @@ import LoadingSpinner from "../../components/ui/LoadingSpinner";
 import { toast } from "react-toastify";
 import { useUser } from "../../contexts/UserContext";
 
+// Safe session parsing helper
+const getSessionData = () => {
+  try {
+    const session = localStorage.getItem("session");
+    if (!session) return null;
+    return JSON.parse(session);
+  } catch (error) {
+    console.error("Error parsing session:", error);
+    return null;
+  }
+};
+
 const Profile = () => {
   const { isDarkMode } = useTheme();
   const dispatch = useDispatch();
@@ -40,27 +52,38 @@ const Profile = () => {
   const [currentProfileImageUrl, setCurrentProfileImageUrl] = useState(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const successToastShown = useRef(false);
-  const session = localStorage.getItem("session");
-  const parsedSession = JSON.parse(session);
-  const userId = parsedSession.userId;
 
-  useEffect(() => {
-    if (!currentProfileImageUrl) return;
+  // Safe session parsing with null checks
+  const parsedSession = getSessionData();
+  const userId = parsedSession?.userId;
 
-    const img = new Image();
-    const fullUrl = `${currentProfileImageUrl}`;
+  // Helper to check if string is likely base64 data
+  const isBase64 = (str) => {
+    if (!str || str.length < 20) return false;
+    // Base64 uses A-Z, a-z, 0-9, +, /, and = for padding
+    const base64Pattern = /^[A-Za-z0-9+/]+=*$/;
+    return base64Pattern.test(str);
+  };
 
-    img.src = fullUrl;
-
-    img.onload = () => console.log("Image loaded successfully");
-    img.onerror = () => console.error("Error loading image");
-  }, [currentProfileImageUrl]);
-
+  // Safe image URL construction - handle base64, paths, and invalid formats
   const imageSrc = currentProfileImageUrl
     ? currentProfileImageUrl.startsWith("data:image")
       ? currentProfileImageUrl
-      : `data:image/jpeg;base64,${currentProfileImageUrl}`
+      : currentProfileImageUrl.startsWith("uploads/") ||
+        currentProfileImageUrl.startsWith("http://") ||
+        currentProfileImageUrl.startsWith("https://") ||
+        currentProfileImageUrl.startsWith("./") ||
+        (currentProfileImageUrl.startsWith("/") && !isBase64(currentProfileImageUrl))
+        ? null // Invalid path format, show fallback
+        : `data:image/png;base64,${currentProfileImageUrl}`
     : null;
+
+  // Debug logging
+  // console.log('Profile Image Debug:', {
+  //   currentProfileImageUrl: currentProfileImageUrl ? currentProfileImageUrl.substring(0, 50) + '...' : null,
+  //   imageSrc: imageSrc ? imageSrc.substring(0, 70) + '...' : null,
+  //   hasImage: !!imageSrc
+  // });
 
   useEffect(() => {
     if (userId) {
@@ -229,22 +252,26 @@ const Profile = () => {
         {!isEditing ? (
           <div className="space-y-6">
             <div className="flex flex-col items-center mb-6">
-              {currentProfileImageUrl ? (
+              {imageSrc ? (
                 <img
                   src={imageSrc}
                   alt="Profile Preview"
                   className="w-20 h-20 rounded-full object-cover"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
+                  }}
                 />
-              ) : (
-                <div
-                  className={`w-20 h-20 rounded-full flex items-center justify-center text-5xl ${isDarkMode
-                    ? "bg-gray-700 text-gray-300"
-                    : "bg-gray-200 text-gray-600"
-                    }`}
-                >
-                  👤
-                </div>
-              )}
+              ) : null}
+              <div
+                className={`w-20 h-20 rounded-full flex items-center justify-center text-5xl ${isDarkMode
+                  ? "bg-gray-700 text-gray-300"
+                  : "bg-gray-200 text-gray-600"
+                  }`}
+                style={{ display: imageSrc ? 'none' : 'flex' }}
+              >
+                👤
+              </div>
               <p
                 className={`text-xl font-semibold ${isDarkMode ? "text-white" : "text-gray-900"
                   }`}
@@ -315,14 +342,22 @@ const Profile = () => {
                     alt="Profile Preview"
                     className="w-20 h-20 rounded-full object-cover"
                   />
-                ) : currentProfileImageUrl ? (
+                ) : imageSrc ? (
                   <img
                     src={imageSrc}
                     alt="Profile Preview"
                     className="w-20 h-20 rounded-full object-cover"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
                   />
-                ) : (
-                  <div className="w-20 h-20 rounded-full flex items-center justify-center text-5xl">
+                ) : null}
+                {!imageFile && (
+                  <div
+                    className="w-20 h-20 rounded-full flex items-center justify-center text-5xl"
+                    style={{ display: (imageFile || imageSrc) ? 'none' : 'flex' }}
+                  >
                     👤
                   </div>
                 )}

@@ -11,7 +11,11 @@ export const UserProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchUserDetails = useCallback(async (userId) => {
-    if (!userId) return;
+    // Validate userId before making API call
+    if (!userId || userId === 'undefined' || userId === 'null') {
+      console.warn('Invalid userId provided to fetchUserDetails:', userId);
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -31,19 +35,24 @@ export const UserProvider = ({ children }) => {
 
       const session = localStorage.getItem("session");
       if (session) {
-        const parsedSession = JSON.parse(session);
+        try {
+          const parsedSession = JSON.parse(session);
 
-        localStorage.setItem(
-          "session",
-          JSON.stringify({
-            ...parsedSession,
-            email: data.email || parsedSession.email,
-            username: data.username || parsedSession.username,
-          })
-        );
+          localStorage.setItem(
+            "session",
+            JSON.stringify({
+              ...parsedSession,
+              email: data.email || parsedSession.email,
+              username: data.username || parsedSession.username,
+            })
+          );
+        } catch (sessionError) {
+          console.error("Error updating session:", sessionError);
+        }
       }
     } catch (error) {
       console.error("Error fetching user details:", error);
+      // Don't clear session on error - user might still be authenticated
     } finally {
       setIsLoading(false);
     }

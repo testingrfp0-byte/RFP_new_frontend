@@ -7,13 +7,31 @@ import {
 import {
   selectQuestionsStatusCounts,
   selectCurrentQuestionFilter,
+  selectAssignedQuestions, // Added
 } from "../../features/modules/questions/selectors";
+import { selectSelectedDocument } from "../../features/modules/documents/selectors"; // Added
 
 const FilterStatus = ({ isDarkMode }) => {
   const dispatch = useDispatch();
 
-  const statusCounts = useSelector(selectQuestionsStatusCounts);
+  const assignedQuestions = useSelector(selectAssignedQuestions); // Use full list
+  const selectedDocument = useSelector(selectSelectedDocument); // Sync with selected doc
   const currentFilter = useSelector(selectCurrentQuestionFilter);
+
+  // Calculate counts locally to ensure they stay in sync with UI updates
+  const statusCounts = React.useMemo(() => {
+    // Filter questions by document if one is selected
+    const questionsToCount = selectedDocument
+      ? assignedQuestions.filter((q) => q.rfp_id === selectedDocument.rfp_id)
+      : assignedQuestions;
+
+    return {
+      submitted: questionsToCount.filter((q) => q.is_submitted || q.submit_status === "submitted").length,
+      notSubmitted: questionsToCount.filter((q) => q.submit_status === "not submitted").length,
+      process: questionsToCount.filter((q) => q.submit_status === "process").length,
+      total: questionsToCount.length,
+    };
+  }, [assignedQuestions, selectedDocument]);
 
   useEffect(() => {
     dispatch(fetchFilterQuestionsRequest());
@@ -42,24 +60,24 @@ const FilterStatus = ({ isDarkMode }) => {
           value={currentFilter}
           onChange={(e) => handleFilterChange(e.target.value)}
           className={`flex-grow px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isDarkMode
-              ? "bg-gray-700 text-gray-300 border border-gray-600 focus:ring-purple-500 focus:border-purple-500"
-              : "bg-white text-gray-700 border border-gray-300 focus:ring-purple-500 focus:border-purple-500"
+            ? "bg-gray-700 text-gray-300 border border-gray-600 focus:ring-purple-500 focus:border-purple-500"
+            : "bg-white text-gray-700 border border-gray-300 focus:ring-purple-500 focus:border-purple-500"
             }`}
         >
           <option value="submitted">
-            Submitted: {statusCounts?.submitted || 0}
+            Submitted: {statusCounts.submitted}
           </option>
 
           <option value="not submitted">
-            Not Submitted: {statusCounts?.notSubmitted || 0}
+            Not Submitted: {statusCounts.notSubmitted}
           </option>
 
           <option value="process">
-            Process: {statusCounts?.process || 0}
+            Process: {statusCounts.process}
           </option>
 
           <option value="all">
-            Total Questions: {statusCounts?.total || 0}
+            Total Questions: {statusCounts.total}
           </option>
         </select>
       </div>

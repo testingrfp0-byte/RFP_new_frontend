@@ -57,12 +57,31 @@ const ReviewerQuestionsList = ({ isDarkMode, selfAssignMode }) => {
     }
   }, [selectedDocKey, documentGroups]);
 
-  const totalQuestionsCount = filteredQuestions.length;
-  const submittedCount = filteredQuestions.filter((q) => q.is_submitted).length;
-  const notSubmittedCount = filteredQuestions.filter(
+  // Auto-select first document when data loads to prevent empty state
+  useEffect(() => {
+    const documents = Object.entries(documentGroups);
+
+    // Auto-select first document if:
+    // 1. No document is currently selected
+    // 2. Documents are available
+    // 3. Questions exist
+    if (!selectedDocKey && documents.length > 0 && filteredQuestions.length > 0) {
+      setSelectedDocKey(documents[0][0]);
+    }
+  }, [documentGroups, selectedDocKey, filteredQuestions.length]);
+
+  // Calculate counts from ALL assigned questions (not filtered by status)
+  // Only filter by selectedDocument if one is selected
+  const questionsForCounting = selectedDocument
+    ? assignedQuestions.filter((q) => q.rfp_id === selectedDocument.rfp_id)
+    : assignedQuestions;
+
+  const totalQuestionsCount = questionsForCounting.length;
+  const submittedCount = questionsForCounting.filter((q) => q.is_submitted || q.submit_status === "submitted").length;
+  const notSubmittedCount = questionsForCounting.filter(
     (q) => q.submit_status === "not submitted"
   ).length;
-  const processCount = filteredQuestions.filter(
+  const processCount = questionsForCounting.filter(
     (q) => q.submit_status === "process"
   ).length;
 
@@ -76,8 +95,8 @@ const ReviewerQuestionsList = ({ isDarkMode, selfAssignMode }) => {
       >
         <div
           className={`p-8 rounded-xl shadow-2xl text-center transition-colors ${isDarkMode
-              ? "bg-gray-800 border border-gray-700"
-              : "bg-white border border-gray-200"
+            ? "bg-gray-800 border border-gray-700"
+            : "bg-white border border-gray-200"
             }`}
         >
           <div className="mb-6">
@@ -118,8 +137,8 @@ const ReviewerQuestionsList = ({ isDarkMode, selfAssignMode }) => {
   return (
     <div
       className={`p-6 rounded-xl shadow-xl ${isDarkMode
-          ? "bg-gray-800 border border-gray-600"
-          : "bg-white border border-gray-200"
+        ? "bg-gray-800 border border-gray-600"
+        : "bg-white border border-gray-200"
         }`}
     >
       <div className="flex items-center gap-3 mb-6">
@@ -189,12 +208,12 @@ const ReviewerQuestionsList = ({ isDarkMode, selfAssignMode }) => {
                   key={docKey}
                   onClick={() => setSelectedDocKey(docKey)}
                   className={`min-w-[260px] cursor-pointer rounded-xl p-5 border-2 transition-all border ${isSelected
-                      ? isDarkMode
-                        ? "border-4 bg-gray-600/40 border-purple-500"
-                        : "border-4 bg-gray-100 border-purple-500"
-                      : isDarkMode
-                        ? "bg-gray-700/50 border-gray-600 hover:border-purple-400"
-                        : "bg-gray-100 border-gray-300 hover:border-purple-400"
+                    ? isDarkMode
+                      ? "border-4 bg-gray-600/40 border-purple-500"
+                      : "border-4 bg-gray-100 border-purple-500"
+                    : isDarkMode
+                      ? "bg-gray-700/50 border-gray-600 hover:border-purple-400"
+                      : "bg-gray-100 border-gray-300 hover:border-purple-400"
                     }`}
                 >
                   <div className="flex flex-col items-center text-center gap-2">
