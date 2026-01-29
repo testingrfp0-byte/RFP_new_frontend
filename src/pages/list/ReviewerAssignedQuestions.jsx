@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { ToastContainer } from "react-toastify";
+
 import ToasterNotification from "../../components/ui/ToasterNotification";
 
 import {
@@ -260,7 +260,7 @@ export default function ReviewerAssignedQuestions() {
       className={`p-4 transition-colors ${isDarkMode ? "bg-gray-900" : "bg-gray-50"
         }`}
     >
-      <ToastContainer position="top-right" autoClose={3000} />
+
 
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">

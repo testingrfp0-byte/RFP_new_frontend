@@ -1,9 +1,10 @@
 import { useTheme } from "../contexts/ThemeContext";
 import { useUser } from "../contexts/UserContext";
 
-export default function TopBar({ userName, userRole, onLogout, userId }) {
+export default function TopBar({ userName:userNameProp, userRole, onLogout }) {
   const { isDarkMode, toggleTheme } = useTheme();
-  const { userProfileImage } = useUser();
+  const { userProfileImage, userEmail } = useUser();
+  const displayEmail = userEmail || userNameProp;
 
   return (
     <div
@@ -80,7 +81,7 @@ export default function TopBar({ userName, userRole, onLogout, userId }) {
                 isDarkMode ? "text-white" : "text-gray-900"
               }`}
             >
-              {userName || "Admin User"}
+              {displayEmail || "Unknown User"}
             </p>
             <p
               className={`text-xs transition-colors ${

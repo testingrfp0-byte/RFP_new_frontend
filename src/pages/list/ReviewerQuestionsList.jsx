@@ -1,8 +1,6 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import QuestionCard from "../../components/ui/ReviewerQuestionCard";
-import LoadingSpinner from "../../components/ui/LoadingSpinner";
 
 import {
   selectAssignedQuestions,
@@ -17,9 +15,7 @@ const ReviewerQuestionsList = ({ isDarkMode, selfAssignMode }) => {
   const loading = useSelector(selectQuestionsLoading);
   const currentFilter = useSelector(selectCurrentQuestionFilter);
   const selectedDocument = useSelector(selectSelectedDocument);
-
   const [selectedDocKey, setSelectedDocKey] = useState(null);
-
   const filteredQuestions = assignedQuestions.filter((q) => {
     if (selectedDocument && q.rfp_id !== selectedDocument.rfp_id) {
       return false;
@@ -38,6 +34,29 @@ const ReviewerQuestionsList = ({ isDarkMode, selfAssignMode }) => {
     }
   });
 
+  const documentGroups = filteredQuestions.reduce((acc, q) => {
+    const docName = q.project_name || q.filename || "Unknown Document";
+    const docKey = `${docName}_${q.rfp_id}`;
+
+    if (!acc[docKey]) {
+      acc[docKey] = {
+        docName,
+        fileName: q.filename,
+        assignedAt: q.assigned_at,
+        questions: [],
+      };
+    }
+
+    acc[docKey].questions.push(q);
+    return acc;
+  }, {});
+
+  useEffect(() => {
+    if (selectedDocKey && !documentGroups[selectedDocKey]) {
+      setSelectedDocKey(null);
+    }
+  }, [selectedDocKey, documentGroups]);
+
   const totalQuestionsCount = filteredQuestions.length;
   const submittedCount = filteredQuestions.filter((q) => q.is_submitted).length;
   const notSubmittedCount = filteredQuestions.filter(
@@ -46,6 +65,8 @@ const ReviewerQuestionsList = ({ isDarkMode, selfAssignMode }) => {
   const processCount = filteredQuestions.filter(
     (q) => q.submit_status === "process"
   ).length;
+
+  const documents = Object.entries(documentGroups);
 
   if (loading) {
     return (
@@ -90,26 +111,6 @@ const ReviewerQuestionsList = ({ isDarkMode, selfAssignMode }) => {
     );
   }
 
-  const documentGroups = filteredQuestions.reduce((acc, q) => {
-    const docName = q.project_name || q.filename || "Unknown Document";
-    const docKey = `${docName}_${q.rfp_id}`;
-
-    if (!acc[docKey]) {
-      acc[docKey] = {
-        docName,
-        fileName: q.filename,
-        assignedAt: q.assigned_at,
-        questions: [],
-      };
-    }
-
-    acc[docKey].questions.push(q);
-    return acc;
-  }, {});
-
-  const documents = Object.entries(documentGroups);
-
-  // Handle empty state for selfAssignMode
   if (!filteredQuestions.length && selfAssignMode) {
     return null;
   }
@@ -117,8 +118,8 @@ const ReviewerQuestionsList = ({ isDarkMode, selfAssignMode }) => {
   return (
     <div
       className={`p-6 rounded-xl shadow-xl ${isDarkMode
-        ? "bg-gray-800 border border-gray-600"
-        : "bg-white border border-gray-200"
+          ? "bg-gray-800 border border-gray-600"
+          : "bg-white border border-gray-200"
         }`}
     >
       <div className="flex items-center gap-3 mb-6">
@@ -172,7 +173,9 @@ const ReviewerQuestionsList = ({ isDarkMode, selfAssignMode }) => {
           </p>
 
           <p className="text-sm mt-1 text-gray-500">
-            Upload your first RFP document to get started
+            {currentFilter === "all"
+              ? "No questions assigned to you yet"
+              : `No ${currentFilter} questions found`}
           </p>
         </div>
       ) : (
@@ -185,17 +188,16 @@ const ReviewerQuestionsList = ({ isDarkMode, selfAssignMode }) => {
                 <div
                   key={docKey}
                   onClick={() => setSelectedDocKey(docKey)}
-                  className={`min-w-[260px] cursor-pointer rounded-xl p-5 border-2 transition-all ${isSelected
-                    ? isDarkMode
-                      ? "bg-gray-600/40 border-purple-500"
-                      : "bg-gray-100 border-purple-500"
-                    : isDarkMode
-                      ? "bg-gray-700/50 border-gray-600 hover:border-purple-400"
-                      : "bg-gray-100 border-gray-300 hover:border-purple-400"
+                  className={`min-w-[260px] cursor-pointer rounded-xl p-5 border-2 transition-all border ${isSelected
+                      ? isDarkMode
+                        ? "border-4 bg-gray-600/40 border-purple-500"
+                        : "border-4 bg-gray-100 border-purple-500"
+                      : isDarkMode
+                        ? "bg-gray-700/50 border-gray-600 hover:border-purple-400"
+                        : "bg-gray-100 border-gray-300 hover:border-purple-400"
                     }`}
                 >
                   <div className="flex flex-col items-center text-center gap-2">
-
                     <div className="w-12 h-12 bg-purple-500/30 rounded-lg flex items-center justify-center">
                       <span className="text-2xl">📄</span>
                     </div>
@@ -215,7 +217,6 @@ const ReviewerQuestionsList = ({ isDarkMode, selfAssignMode }) => {
                     )}
                   </div>
                 </div>
-
               );
             })}
           </div>
@@ -224,7 +225,7 @@ const ReviewerQuestionsList = ({ isDarkMode, selfAssignMode }) => {
             <div className="text-center py-5 text-gray-500">
               <span>📄</span>Please select a document to view questions
             </div>
-          ) : (
+          ) : documentGroups[selectedDocKey] ? (
             <div className="space-y-3">
               {documentGroups[selectedDocKey].questions.map(
                 (question, index) => (
@@ -238,7 +239,7 @@ const ReviewerQuestionsList = ({ isDarkMode, selfAssignMode }) => {
                 )
               )}
             </div>
-          )}
+          ) : null}
         </>
       )}
     </div>

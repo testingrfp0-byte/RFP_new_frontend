@@ -7,7 +7,7 @@ export default function AddTeamUserModal({
     isDarkMode,
     name,
     email,
-    role, // New prop
+    role,
     loading,
     errors,
     handleFieldChange,

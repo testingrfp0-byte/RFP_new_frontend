@@ -111,6 +111,15 @@ function AppContent() {
         position="top-right"
         autoClose={3000}
         theme={isDarkMode ? "dark" : "light"}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable
+        pauseOnHover
+        limit={5}
+        style={{ zIndex: 9999 }}
       />
 
       <Routes>

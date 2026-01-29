@@ -198,15 +198,15 @@ const DocumentDetails = ({ isDarkMode }) => {
     }
   }, [selectedDocument?.id, dispatch]);
 
-  if (loading || assignedReviewersLoading) {
-    return <LoadingSpinner message="Loading document details..." isDarkMode={isDarkMode} />;
-  }
+  // if (loading || assignedReviewersLoading) {
+  //   return <LoadingSpinner message="Loading document details..." isDarkMode={isDarkMode} />;
+  // }
 
   if (!details) {
     return (
       <div className="text-center py-12">
         <p className={`text-lg ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-          Failed to load document details
+         📄 Failed to load document details
         </p>
       </div>
     );
@@ -223,8 +223,13 @@ const DocumentDetails = ({ isDarkMode }) => {
   }
 
   return (
-    <div className={`rounded-xl shadow-xl transition-colors ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
-      }`}>
+    <div
+      className={`rounded-xl shadow-xl transition-colors animate-slide-up ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
+        }`}
+      style={{
+        animation: 'slideUp 0.5s ease-out forwards'
+      }}
+    >
       <div className="p-6">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">

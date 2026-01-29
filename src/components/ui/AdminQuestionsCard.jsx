@@ -31,7 +31,6 @@ import {
 const AdminQuestionCard = ({ question, idx, expandedQuestion, setExpandedQuestion }) => {
     const { isDarkMode } = useTheme();
     const dispatch = useDispatch();
-
     const isEditing = useSelector(selectIsEditing(question.question_id));
     const isGenerating = useSelector(selectIsGenerating(question.question_id));
     const submissionStatus = useSelector(selectSubmissionStatus(question.question_id));
@@ -41,32 +40,20 @@ const AdminQuestionCard = ({ question, idx, expandedQuestion, setExpandedQuestio
     const versions = useSelector(selectVersionsByQuestion(question.question_id)) || [];
     const answersLoading = useSelector(selectAnswersLoading);
     const chatPromptSaved = useSelector(selectChatPromptSaved(question.question_id));
-
     const [inputValue, setInputValue] = useState("");
     const [showInput, setShowInput] = useState(false);
     const [showVersionDropdown, setShowVersionDropdown] = useState(false);
     const [manualSaved, setManualSaved] = useState(false);
-
-    // Local state for textarea value (only updates Redux/API on Save)
     const [localAnswer, setLocalAnswer] = useState(question.answer || "");
 
-    // Sync local answer when question changes
     useEffect(() => {
         setLocalAnswer(question.answer || "");
     }, [question.answer]);
 
-    // Removed auto-enable editing mode - buttons will display immediately after generation
-    // Users can manually click "Edit Answer" to enable editing if needed
-
-    // Hide chat input after API call completes successfully
     useEffect(() => {
-        // Only hide if we were loading and now we're not (API just completed)
         if (!chatLoading && showInput) {
-            // Check if there was actually a loading state before
-            // This prevents hiding when first opening the input
             const wasLoading = sessionStorage.getItem(`chat_loading_${question.question_id}`);
             if (wasLoading === 'true') {
-                // Small delay to ensure user sees the success toast before input disappears
                 const timer = setTimeout(() => {
                     setShowInput(false);
                     sessionStorage.removeItem(`chat_loading_${question.question_id}`);
@@ -74,50 +61,43 @@ const AdminQuestionCard = ({ question, idx, expandedQuestion, setExpandedQuestio
                 return () => clearTimeout(timer);
             }
         } else if (chatLoading) {
-            // Mark that we're currently loading
             sessionStorage.setItem(`chat_loading_${question.question_id}`, 'true');
         }
     }, [chatLoading, showInput, question.question_id]);
 
-    // Local answer update (only updates local state, NOT Redux)
     const handleLocalAnswerChange = (newAnswer) => {
         setLocalAnswer(newAnswer);
     };
 
     const handleGenerateAnswer = () => {
         dispatch(generateAnswerRequest(question.question_id));
-        setManualSaved(false); // Reset manual saved flag when regenerating
+        setManualSaved(false);
     };
 
     const handleToggleEdit = () => {
         dispatch(toggleEditMode(question.question_id));
-        // Reset manual saved flag when entering edit mode
         if (!isEditing) {
             setManualSaved(false);
         }
     };
 
-    // Save button → calls /update-answer/:id API
     const handleSaveAnswer = () => {
         dispatch(
             updateAnswerRequest({
                 questionId: question.question_id,
                 answer: localAnswer,
-                isLocal: false, // This triggers the API call
+                isLocal: false,
             })
         );
         toast.success("Answer saved!");
         dispatch(fetchVersionsRequest(question.question_id));
         setManualSaved(true);
-        // Disable editing mode after save
         if (isEditing) {
             dispatch(toggleEditMode(question.question_id));
         }
     };
 
-    // Submit button → calls different API based on submit_status
     const handleSubmit = () => {
-        // If already submitted, call update API instead of submit API
         if (question.submit_status === "submitted") {
             dispatch(
                 updateAnswerRequest({
@@ -126,21 +106,18 @@ const AdminQuestionCard = ({ question, idx, expandedQuestion, setExpandedQuestio
                     isLocal: false,
                 })
             );
-            // Turn off editing mode after successful update
             if (isEditing) {
                 dispatch(toggleEditMode(question.question_id));
             }
             toast.success("Answer updated successfully!");
             dispatch(fetchVersionsRequest(question.question_id));
         } else {
-            // First time submission - call submit API
             dispatch(
                 submitAnswerRequest({
                     questionId: question.question_id,
                     answer: localAnswer,
                 })
             );
-            // Disable editing mode after first submission
             if (isEditing) {
                 dispatch(toggleEditMode(question.question_id));
             }
@@ -152,7 +129,6 @@ const AdminQuestionCard = ({ question, idx, expandedQuestion, setExpandedQuestio
 
     const handleNotForMe = () => {
         dispatch(notForMeRequest(question.question_id));
-        toast.success("Marked as Not for Me");
     };
 
     const handleAnalyzeQuestion = () => {
@@ -179,7 +155,6 @@ const AdminQuestionCard = ({ question, idx, expandedQuestion, setExpandedQuestio
             })
         );
         setInputValue("");
-        // Don't hide input immediately - let it stay visible during loading
     };
 
     const toggleVersionDropdown = () => {

@@ -1,3 +1,6 @@
+// Cache for empty arrays per questionId to avoid creating new references
+const emptyArrayCache = new Map();
+
 export const selectIsEditing = (questionId) => (state) =>
   !!state.answers.editing[questionId];
 
@@ -10,8 +13,17 @@ export const selectSubmissionStatus = (questionId) => (state) =>
 export const selectSubmissionError = (questionId) => (state) =>
   state.answers.submissionErrors[questionId];
 
-export const selectVersionsByQuestion = (questionId) => (state) =>
-  state.answers.versions[questionId] || [];
+// Memoized selector to prevent unnecessary rerenders
+export const selectVersionsByQuestion = (questionId) => (state) => {
+  const versions = state.answers.versions[questionId];
+  if (versions) return versions;
+
+  // Return cached empty array for this questionId
+  if (!emptyArrayCache.has(questionId)) {
+    emptyArrayCache.set(questionId, []);
+  }
+  return emptyArrayCache.get(questionId);
+};
 
 export const selectVersionsLoading = (questionId) => (state) =>
   state.answers.loadingVersions[questionId];

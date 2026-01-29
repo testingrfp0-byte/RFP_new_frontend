@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTheme } from "../../contexts/ThemeContext";
 import { Link } from "react-router-dom";
@@ -19,7 +19,7 @@ import { useUser } from "../../contexts/UserContext";
 const Profile = () => {
   const { isDarkMode } = useTheme();
   const dispatch = useDispatch();
-  const { updateProfileImage } = useUser();
+  const { updateProfileImage, updateUserDetails } = useUser();
 
   const { loading, data: user } = useSelector(
     (state) => state.profile
@@ -39,6 +39,7 @@ const Profile = () => {
   const [newProfileImageFile, setNewProfileImageFile] = useState(null);
   const [currentProfileImageUrl, setCurrentProfileImageUrl] = useState(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const successToastShown = useRef(false);
   const session = localStorage.getItem("session");
   const parsedSession = JSON.parse(session);
   const userId = parsedSession.userId;
@@ -81,11 +82,22 @@ const Profile = () => {
       setEmail(user.email || "");
       setCurrentProfileImageUrl(user.image_base64 || null);
       setIsInitialLoad(false);
+
+      // Update UserContext with new image whenever user data changes
+      if (user.image_base64) {
+        updateProfileImage(user.image_base64);
+      }
+
+      // Update UserContext with new email/username
+      if (user.email || user.username) {
+        updateUserDetails(user.email, user.username);
+      }
     }
-  }, [user]);
+  }, [user, updateProfileImage, updateUserDetails]);
 
   useEffect(() => {
-    if (success) {
+    if (success && !successToastShown.current) {
+      successToastShown.current = true;
       setIsEditing(false);
       setImageFile(null);
 
@@ -94,12 +106,13 @@ const Profile = () => {
         autoClose: 3000,
       });
 
-      if (user?.image_base64) {
-        updateProfileImage(user.image_base64);
-      }
-
+      // Reset the ref and success state after allowing user details to update
+      setTimeout(() => {
+        successToastShown.current = false;
+        dispatch(resetUpdateProfileState());
+      }, 1000);
     }
-  }, [success, user, updateProfileImage]);
+  }, [success, dispatch]);
 
   useEffect(() => {
     if (updateError) {

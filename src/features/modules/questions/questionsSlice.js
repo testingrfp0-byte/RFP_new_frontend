@@ -77,8 +77,23 @@ const questionsSlice = createSlice({
       state.error = null;
     },
     deleteQuestionSuccess: (state, action) => {
+      const questionId = action.payload;
+
+      // Remove from all question lists
       state.assigned = state.assigned.filter(
-        (q) => q.question_id !== action.payload
+        (q) => q.question_id !== questionId && q.id !== questionId
+      );
+
+      state.filtered = state.filtered.filter(
+        (q) => q.question_id !== questionId && q.id !== questionId
+      );
+
+      state.submitted = state.submitted.filter(
+        (q) => q.question_id !== questionId && q.id !== questionId
+      );
+
+      state.checkSubmitQuestions = state.checkSubmitQuestions.filter(
+        (q) => q.question_id !== questionId && q.id !== questionId
       );
     },
     deleteQuestionFailure: (state, action) => {

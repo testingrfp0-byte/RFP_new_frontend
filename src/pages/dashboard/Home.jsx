@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 
 import { useTheme } from "../../contexts/ThemeContext";
+import { useUser } from "../../contexts/UserContext";
 
 // Redux
 import {
@@ -28,20 +29,27 @@ import ReviewersDashboard from "./ReviwersDashboard";
 
 const Home = ({ pageType = "home", selfAssignMode = false }) => {
   const { isDarkMode } = useTheme();
+  const { fetchUserDetails } = useUser();
   const dispatch = useDispatch();
   const location = useLocation();
 
   const userRole = useSelector(selectUserRole);
   const [initialLoading, setInitialLoading] = useState(true);
 
-  // Init session
+  // Init session and fetch user details
   useEffect(() => {
     const session = localStorage.getItem("session");
     if (session) {
       const parsed = JSON.parse(session);
       dispatch(setCurrentUser(parsed));
+
+      // Fetch user details to get profile image
+      if (parsed.userId) {
+        // console.log("Home: Fetching user details for userId:", parsed.userId);
+        fetchUserDetails(parsed.userId);
+      }
     }
-  }, [dispatch]);
+  }, [dispatch, fetchUserDetails]);
 
   // Role-based fetching
   useEffect(() => {

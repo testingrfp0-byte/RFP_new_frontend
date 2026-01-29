@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FiLoader } from "react-icons/fi";
 import { motion } from "framer-motion";
@@ -177,7 +177,7 @@ export default function KeystoneManager({ isDarkMode }) {
 
   return (
     <div className="max-w-7xl mx-auto min-h-screen">
-      <ToastContainer />
+
 
       <div className="mb-8">
         <div className="flex items-center justify-between mb-6">

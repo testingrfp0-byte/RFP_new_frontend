@@ -43,7 +43,7 @@ import {
   fetchEditApprovePageSuccess
 } from "./questionsSlice";
 import { fetchAssignedReviewersRequest } from "../assignments/assignmentsSlice";
-import { fetchFilterDataRequest } from "../documents/documentsSlice";
+import { fetchFilterDataRequest, fetchDocumentDetailsRequest } from "../documents/documentsSlice";
 
 const mapQuestion = (q, index) => ({
   question_id: q.question_id || `temp-${index}`,
@@ -184,6 +184,12 @@ function* deleteQuestionWorker(action) {
     }
 
     yield put(deleteQuestionSuccess(questionId));
+
+    // Refetch document details to update the questions list in UI
+    yield put(fetchDocumentDetailsRequest({
+      id: rfpId,
+      status: "total question"
+    }));
 
     yield put(fetchAssignedReviewersRequest(rfpId));
 

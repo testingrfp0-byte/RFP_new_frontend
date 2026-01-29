@@ -1,6 +1,6 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
+
 import { useDispatch, useSelector } from "react-redux";
 import { useMemo } from "react";
 import DocumentLibrary from "../list/DocumentLibrary";
@@ -30,6 +30,14 @@ const AdminDashboard = ({ isDarkMode, pageType }) => {
   const documents = useSelector(selectDocuments);
   const documentsLoading = useSelector(selectDocumentsLoading);
   const selectedDocument = useSelector(selectSelectedDocument);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  // Track when documents are loaded for the first time
+  useEffect(() => {
+    if (documents && documents.length > 0) {
+      setIsInitialLoad(false);
+    }
+  }, [documents]);
 
   const handleDocumentSelect = (document) => {
     dispatch(selectDocument(document));
@@ -55,8 +63,8 @@ const AdminDashboard = ({ isDarkMode, pageType }) => {
     );
   }, [documents]);
 
-  // Main big loader
-  if (documentsLoading) {
+  // Main big loader - only show on initial load
+  if (documentsLoading && isInitialLoad) {
     return (
       <div
         className={`min-h-screen flex items-center justify-center transition-colors ${isDarkMode ? "bg-gray-900" : "bg-gray-50"
@@ -101,7 +109,7 @@ const AdminDashboard = ({ isDarkMode, pageType }) => {
 
   return (
     <div className={`p-4 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
-      <ToastContainer position="top-right" autoClose={3000} />
+
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}

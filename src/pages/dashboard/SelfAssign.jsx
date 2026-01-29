@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { ToastContainer } from "react-toastify";
+
 import ToasterNotification from "../../components/ui/ToasterNotification";
 import {
     fetchAssignedQuestionsRequest,
@@ -10,7 +10,8 @@ import {
 } from "../../features/modules/questions/questionsSlice";
 import {
     selectAssignedQuestions,
-    selectQuestionsLoading
+    selectQuestionsLoading,
+    selectCurrentQuestionFilter
 } from "../../features/modules/questions/selectors";
 import AdminQuestionCard from "../../components/ui/AdminQuestionsCard";
 import FilterStatus from "../../components/ui/FilterStatus";
@@ -21,8 +22,8 @@ const SelfAssignDashboard = () => {
     const dispatch = useDispatch();
     const documentAnalysisRef = useRef(null);
     const assignedQuestions = useSelector(selectAssignedQuestions);
+    const currentFilter = useSelector(selectCurrentQuestionFilter);
     const [selectedPdf, setSelectedPdf] = useState(null);
-    const [filterStatus, setFilterStatus] = useState("all");
     const [expandedQuestion, setExpandedQuestion] = useState(null);
     const [toasterNotification, setToasterNotification] = useState(null);
     const [initialLoad, setInitialLoad] = useState(true);
@@ -41,11 +42,28 @@ const SelfAssignDashboard = () => {
     const matchedArray = useMemo(() => {
         if (!assignedQuestions) return [];
         let filtered = assignedQuestions.filter(q => q.is_deleted === false);
-        if (filterStatus !== "all") {
-            filtered = filtered.filter((q) => q.submit_status === filterStatus);
+
+        // Apply filter based on Redux currentFilter state
+        if (currentFilter !== "all") {
+            filtered = filtered.filter((q) => q.submit_status === currentFilter);
         }
+
         return filtered;
-    }, [assignedQuestions, filterStatus]);
+    }, [assignedQuestions, currentFilter]);
+
+    // Calculate counts for each status
+    const { totalQuestionsCount, submittedCount, notSubmittedCount, processCount } = useMemo(() => {
+        if (!assignedQuestions) return { totalQuestionsCount: 0, submittedCount: 0, notSubmittedCount: 0, processCount: 0 };
+
+        const nonDeletedQuestions = assignedQuestions.filter(q => q.is_deleted === false);
+
+        return {
+            totalQuestionsCount: nonDeletedQuestions.length,
+            submittedCount: nonDeletedQuestions.filter(q => q.submit_status === "submitted").length,
+            notSubmittedCount: nonDeletedQuestions.filter(q => q.submit_status === "not submitted").length,
+            processCount: nonDeletedQuestions.filter(q => q.submit_status === "process").length
+        };
+    }, [assignedQuestions]);
 
     useEffect(() => {
         const session = localStorage.getItem("session");
@@ -109,7 +127,7 @@ const SelfAssignDashboard = () => {
     }
     return (
         <div className={`min-h-screen p-4 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
-            <ToastContainer position="top-right" autoClose={3000} />
+
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="mb-6">
@@ -133,10 +151,36 @@ const SelfAssignDashboard = () => {
                         }`}
                 >
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="w-2 h-8 bg-purple-500 rounded-full"></div>
-                        <h2 className={`text-xl font-semibold ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+                        <div className="w-2 h-8 bg-purple-500 rounded-full" />
+                        <h2
+                            className={`text-xl font-semibold ${isDarkMode ? "text-white" : "text-gray-900"
+                                }`}
+                        >
                             Responses in Process
                         </h2>
+                        {currentFilter === "all" && (
+                            <span className="bg-purple-500/20 text-purple-400 px-2 py-1 rounded-full text-xs">
+                                {totalQuestionsCount} questions
+                            </span>
+                        )}
+
+                        {currentFilter === "submitted" && (
+                            <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                                Submitted: <b>{submittedCount}</b>
+                            </span>
+                        )}
+
+                        {currentFilter === "not submitted" && (
+                            <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs">
+                                Not for me: <b>{notSubmittedCount}</b>
+                            </span>
+                        )}
+
+                        {currentFilter === "process" && (
+                            <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
+                                Pending: <b>{processCount}</b>
+                            </span>
+                        )}
                     </div>
 
                     {matchedArray.length === 0 ? (
@@ -145,12 +189,20 @@ const SelfAssignDashboard = () => {
                                 className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${isDarkMode ? "bg-gray-700" : "bg-gray-200"
                                     }`}
                             >
-                                <span className={`text-2xl ${isDarkMode ? "text-gray-500" : "text-gray-400"}`}>
-                                    📄
-                                </span>
+                                <span className="text-2xl">📝</span>
                             </div>
-                            <p className={`text-lg ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-                                No questions assigned to you yet
+
+                            <p
+                                className={`text-lg ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                                    }`}
+                            >
+                                No questions found
+                            </p>
+
+                            <p className="text-sm mt-1 text-gray-500">
+                                {currentFilter === "all"
+                                    ? "No questions assigned to you yet"
+                                    : `No ${currentFilter} questions found`}
                             </p>
                         </div>
                     ) : (
@@ -204,7 +256,13 @@ const SelfAssignDashboard = () => {
                             </div>
 
                             {/* Questions List */}
-                            {selectedPdf && (
+                            {!selectedPdf ? (
+                                <div className="text-center py-12">
+                                    <p className={`text-lg ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                                        📄 Please select a document to view questions
+                                    </p>
+                                </div>
+                            ) : (
                                 <div ref={documentAnalysisRef} className="space-y-3 mt-8">
                                     {matchedArray
                                         .filter((q) => q.rfp_id === selectedPdf.rfp_id)

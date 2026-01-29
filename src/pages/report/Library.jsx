@@ -222,8 +222,7 @@ export default function Library() {
         onSuccess: () => {
           clearInterval(progressInterval);
           setUploadProgress((prev) => ({ ...prev, [file.name]: 100 }));
-          // toast.success(`${file.name} uploaded successfully`); // Handled in saga
-          setNewProjectName(""); // Clear project name on success
+          setNewProjectName("");
 
           setTimeout(() => {
             setUploadingFiles((prev) =>
@@ -233,8 +232,6 @@ export default function Library() {
         },
         onError: () => {
           clearInterval(progressInterval);
-          // toast.error(`${file.name} upload failed`); // Handled in saga
-
           setUploadProgress((prev) => {
             const copy = { ...prev };
             delete copy[file.name];
@@ -262,11 +259,8 @@ export default function Library() {
 
   const groupedCleanFiles = groupFilesByProject(clean);
   const groupedTrainingFiles = groupFilesByProject(trainingMaterials);
-  const groupedLearningFiles = groupFilesByProject(learningDocuments);
-
   const sortedCleanProjects = Object.keys(groupedCleanFiles).sort();
   const sortedTrainingProjects = Object.keys(groupedTrainingFiles).sort();
-  const sortedLearningProjects = Object.keys(groupedLearningFiles).sort();
 
   const tabs = [
     {
@@ -446,7 +440,6 @@ export default function Library() {
 
     return (
       <>
-        {/* <ToastContainer position="top-right" autoClose={3000} /> */}
         <div className="space-y-4 mb-6">
           <div>
             <label
@@ -542,7 +535,7 @@ export default function Library() {
       className={`p-4 transition-colors ${isDarkMode ? "bg-gray-900" : "bg-gray-50"
         }`}
     >
-      {/* <ToastContainer position="top-right" autoClose={3000} /> */}
+
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1

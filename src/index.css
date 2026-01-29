@@ -23,3 +23,35 @@ code {
   color: black;
   background-color: white;
 }
+
+.Toastify__toast-container {
+  z-index: 9999 !important;
+}
+
+.Toastify__toast {
+  z-index: 9999 !important;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.Toastify__toast--top-right {
+  animation-fill-mode: forwards !important;
+}
+
+/* Slide up animation for DocumentDetails */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s ease-out forwards;
+}

@@ -107,15 +107,12 @@ const documentsSlice = createSlice({
     },
 
     fetchFilterDataRequest: (state) => {
-      state.loading = true;
       state.error = null;
     },
     fetchFilterDataSuccess: (state, action) => {
-      state.loading = false;
       state.filterData = action.payload;
     },
     fetchFilterDataFailure: (state, action) => {
-      state.loading = false;
       state.error = action.payload;
     },
   },

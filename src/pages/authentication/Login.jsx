@@ -8,7 +8,6 @@ import {
   clearLoginError,
   resetLoginState,
 } from "../../features/auth/login/reducer";
-import { toast } from "react-toastify";
 import { validateLoginFields } from "../../utilis/fieldValidations";
 import AuthInput from "../../components/ui/AuthInput";
 

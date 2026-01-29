@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
 import EditQuestionDialog from "../../components/ui/EditQuestionDialog";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 
 import {
   fetchCheckSubmitRequest,
@@ -326,7 +326,7 @@ export default function EditApproveResponse() {
 
   return (
     <>
-      <ToastContainer position="top-right" autoClose={3000} />
+
       <div className={`min-h-screen p-4 transition-colors ${isDarkMode ? "bg-gray-900" : "bg-gray-50"
         }`}>
         <div className="max-w-7xl mx-auto">
