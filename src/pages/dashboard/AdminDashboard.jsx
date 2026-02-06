@@ -109,8 +109,6 @@ const AdminDashboard = ({ isDarkMode, pageType }) => {
 
   return (
     <div className={`p-4 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
-
-
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">

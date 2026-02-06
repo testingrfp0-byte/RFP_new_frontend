@@ -1,1 +1,1 @@
-VITE_API_BASE_URL="https://emmaline-lowliest-unusually.ngrok-free.dev"
+VITE_API_BASE_URL="http://3.95.13.206/api"

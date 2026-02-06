@@ -174,12 +174,14 @@ export default function Library() {
       name: file.name,
       category,
       progress: 0,
+      fileKey: `${file.name}_${Date.now()}_${Math.random()}`,
     }));
     setUploadingFiles((prev) => [...prev, ...newUploadingFiles]);
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      uploadSingleFile(file, category, projectName);
+      const fileKey = newUploadingFiles[i].fileKey;
+      uploadSingleFile(file, category, projectName, fileKey);
     }
   };
 
@@ -203,15 +205,36 @@ export default function Library() {
     event.target.value = "";
   };
 
-  const uploadSingleFile = (file, category, projectName) => {
-    setUploadProgress((prev) => ({ ...prev, [file.name]: 0 }));
+  const uploadSingleFile = (file, category, projectName, fileKey) => {
+    setUploadProgress((prev) => ({ ...prev, [fileKey]: 0 }));
 
     const progressInterval = setInterval(() => {
       setUploadProgress((prev) => ({
         ...prev,
-        [file.name]: Math.min((prev[file.name] || 0) + 10, 90),
+        [fileKey]: Math.min((prev[fileKey] || 0) + 10, 90),
       }));
     }, 200);
+
+    // Cleanup function to ensure consistent removal
+    const cleanup = () => {
+      clearInterval(progressInterval);
+
+      // Use functional updates to avoid stale state
+      setUploadProgress((prev) => {
+        const copy = { ...prev };
+        delete copy[fileKey];
+        return copy;
+      });
+
+      setUploadingFiles((prev) =>
+        prev.filter((f) => f.fileKey !== fileKey)
+      );
+    };
+
+    // Fallback timeout
+    const fallbackTimeout = setTimeout(() => {
+      cleanup();
+    }, 30000);
 
     dispatch({
       type: UPLOAD_LIBRARY_REQUEST,
@@ -220,27 +243,18 @@ export default function Library() {
         category,
         projectName,
         onSuccess: () => {
-          clearInterval(progressInterval);
-          setUploadProgress((prev) => ({ ...prev, [file.name]: 100 }));
+          clearTimeout(fallbackTimeout);
           setNewProjectName("");
-
-          setTimeout(() => {
-            setUploadingFiles((prev) =>
-              prev.filter((f) => f.name !== file.name)
-            );
-          }, 800);
+          // Single cleanup call with small delay
+          // setTimeout(() => {
+          //   cleanup();
+          // }, 50);
+          // Immediate cleanup
+          cleanup();
         },
         onError: () => {
-          clearInterval(progressInterval);
-          setUploadProgress((prev) => {
-            const copy = { ...prev };
-            delete copy[file.name];
-            return copy;
-          });
-
-          setUploadingFiles((prev) =>
-            prev.filter((f) => f.name !== file.name)
-          );
+          clearTimeout(fallbackTimeout);
+          cleanup();
         },
       },
     });
@@ -433,7 +447,7 @@ export default function Library() {
     if (userRole === "reviewer") return null;
 
     const isDisabled = uploadingFiles.some(
-      (file) => file.category === category && uploadProgress[file.name] > 0
+      (file) => file.category === category && uploadProgress[file.fileKey] > 0
     ) || loading;
 
     const isDragActive = dragOver[category] || false;
@@ -569,8 +583,9 @@ export default function Library() {
               Uploading Files
             </h3>
 
+
             {uploadingFiles.map((file) => (
-              <div key={file.name} className="mb-3 last:mb-0">
+              <div key={file.fileKey} className="mb-3 last:mb-0">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-500"></div>
                   <span
@@ -580,13 +595,13 @@ export default function Library() {
                     {file.name}
                   </span>
                   <span className="text-sm text-gray-500">
-                    {uploadProgress[file.name]}%
+                    {uploadProgress[file.fileKey] || 0}%
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${uploadProgress[file.name]}%` }}
+                    style={{ width: `${uploadProgress[file.fileKey] || 0}%` }}
                   ></div>
                 </div>
               </div>
@@ -716,7 +731,7 @@ export default function Library() {
                     } ${uploadingFiles.some(
                       (file) =>
                         file.category === "history" &&
-                        uploadProgress[file.name] > 0
+                        uploadProgress[file.fileKey] > 0
                     )
                       ? "cursor-not-allowed opacity-50"
                       : ""
@@ -749,7 +764,7 @@ export default function Library() {
                       disabled={uploadingFiles.some(
                         (file) =>
                           file.category === "history" &&
-                          uploadProgress[file.name] > 0
+                          uploadProgress[file.fileKey] > 0
                       )}
                       multiple
                       ref={historicFileInputRef}
@@ -759,7 +774,7 @@ export default function Library() {
                       className={`bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer inline-block ${uploadingFiles.some(
                         (file) =>
                           file.category === "history" &&
-                          uploadProgress[file.name] > 0
+                          uploadProgress[file.fileKey] > 0
                       )
                         ? "cursor-not-allowed"
                         : ""

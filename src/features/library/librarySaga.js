@@ -1,4 +1,4 @@
-import { call, put, takeLatest } from "redux-saga/effects";
+import { call, put, takeLatest, takeEvery  } from "redux-saga/effects";
 import api from "../../services/apiHelper";
 import * as TYPES from "./libraryType";
 import { LIBRARY_URLS } from "../../services/urlServices";
@@ -139,5 +139,5 @@ export default function* librarySaga() {
   yield takeLatest(TYPES.FETCH_LIBRARY_REQUEST, fetchLibrarySaga);
   yield takeLatest(TYPES.DELETE_LIBRARY_REQUEST, deleteLibrarySaga);
   yield takeLatest(TYPES.VIEW_LIBRARY_REQUEST, viewLibrarySaga);
-  yield takeLatest(TYPES.UPLOAD_LIBRARY_REQUEST, uploadLibrarySaga);
+  yield takeEvery(TYPES.UPLOAD_LIBRARY_REQUEST, uploadLibrarySaga);
 }

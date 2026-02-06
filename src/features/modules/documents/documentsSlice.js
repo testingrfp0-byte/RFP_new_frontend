@@ -65,6 +65,12 @@ const documentsSlice = createSlice({
       state.list = state.list.filter(
         (doc) => doc.id !== action.payload
       );
+      // Clear selected document if it was the one deleted
+      if (state.selected?.id === action.payload) {
+        state.selected = null;
+        state.details = null;
+        state.filterData = null;
+      }
     },
     deleteDocumentFailure: (state, action) => {
       state.deleteLoading = false;
