@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import QuestionCard from '../../components/ui/ReviewerQuestionCard';
-import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import { addQuestionRequest } from '../../features/modules/questions/questionsSlice';
 import { fetchDocumentDetailsRequest } from '../../features/modules/documents/documentsSlice';
 import {
@@ -21,6 +20,7 @@ import {
   fetchAssignedReviewersRequest,
   clearAssignedReviewersData,
 } from '../../features/modules/assignments/assignmentsSlice';
+import { fetchUsersRequest } from '../../features/modules/users/usersSlice';
 import { toast } from "react-toastify";
 import { validateAddQuestionFields } from "../../utilis/fieldValidations";
 
@@ -50,6 +50,12 @@ const DocumentDetails = ({ isDarkMode }) => {
   useEffect(() => {
     if (details && selectedDocument?.id) {
       console.log('Fetching assigned reviewers for document ID:', selectedDocument.id);
+
+      // Ensure users are loaded for checkbox resonance
+      if (!users || users.length === 0) {
+        dispatch(fetchUsersRequest());
+      }
+
       dispatch(fetchAssignedReviewersRequest({ documentId: selectedDocument.id }));
     } else {
       console.warn('Cannot fetch reviewers - missing data:', {
@@ -61,7 +67,7 @@ const DocumentDetails = ({ isDarkMode }) => {
     return () => {
       dispatch(clearAssignedReviewersData());
     };
-  }, [details?.id, selectedDocument?.id, dispatch]);
+  }, [details?.id, selectedDocument?.id, dispatch, users?.length]);
 
   // Process assigned reviewers data
   useEffect(() => {
@@ -206,7 +212,7 @@ const DocumentDetails = ({ isDarkMode }) => {
     return (
       <div className="text-center py-12">
         <p className={`text-lg ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-         📄 Failed to load document details
+          📄 Failed to load document details
         </p>
       </div>
     );

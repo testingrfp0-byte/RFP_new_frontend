@@ -1,1 +1,1 @@
-VITE_API_BASE_URL="http://3.95.13.206/api"
+VITE_API_BASE_URL = "https://undenunciatory-stratous-tandra.ngrok-free.dev"

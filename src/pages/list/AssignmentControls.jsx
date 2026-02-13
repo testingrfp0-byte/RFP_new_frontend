@@ -31,9 +31,12 @@ const AssignmentControls = ({
   );
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
+  // Sync draftReviewers with selectedReviewers whenever it changes
   useEffect(() => {
-    if (showDropdown && selectedReviewers) {
-      setDraftReviewers(selectedReviewers[globalIdx] || []);
+    if (showDropdown) {
+      const currentReviewers = selectedReviewers?.[globalIdx] || [];
+      console.log(`Syncing reviewers for question ${globalIdx}:`, currentReviewers);
+      setDraftReviewers(currentReviewers);
     }
   }, [showDropdown, selectedReviewers, globalIdx]);
 
@@ -94,15 +97,21 @@ const AssignmentControls = ({
         questionId: question.id,
         fileId: selectedDocument.id,
         onSuccess: () => {
+          console.log(`Assignment successful for question ${globalIdx}`);
+          console.log('Assigned reviewers:', draftReviewers);
           toast.success("Reviewers assigned successfully");
           dispatch(setAssignmentDropdown(null));
           setDoneLoading(false);
 
           if (onAssignmentComplete) {
+            console.log('Calling onAssignmentComplete to refresh data...');
             onAssignmentComplete();
+          } else {
+            console.warn('onAssignmentComplete callback is not defined!');
           }
         },
         onError: (msg) => {
+          console.error('Assignment failed:', msg);
           toast.error(msg);
           setDoneLoading(false);
         },
@@ -188,8 +197,8 @@ const AssignmentControls = ({
                       {user.role && (
                         <span
                           className={`ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${user.role.toLowerCase() === 'reviewer'
-                              ? 'bg-green-100 text-green-800 border border-green-200'
-                              : 'bg-gray-100 text-gray-800 border border-gray-200'
+                            ? 'bg-green-100 text-green-800 border border-green-200'
+                            : 'bg-gray-100 text-gray-800 border border-gray-200'
                             } ${isDarkMode && user.role.toLowerCase() === 'reviewer'
                               ? 'bg-green-900/30 text-green-300 border-green-700'
                               : isDarkMode
@@ -211,8 +220,8 @@ const AssignmentControls = ({
                 onClick={handleDone}
                 disabled={doneLoading}
                 className={`px-3 py-1 rounded text-sm transition-colors ${doneLoading
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-gray-500 hover:bg-gray-600 text-white"
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-gray-500 hover:bg-gray-600 text-white"
                   }`}
               >
                 {doneLoading ? "Saving..." : "Done"}

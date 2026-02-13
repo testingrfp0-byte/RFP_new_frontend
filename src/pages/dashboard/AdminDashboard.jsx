@@ -22,6 +22,7 @@ import {
 import {
   fetchAssignedReviewersRequest,
 } from "../../features/modules/assignments/assignmentsSlice";
+import { fetchUsersRequest } from "../../features/modules/users/usersSlice";
 
 const AdminDashboard = ({ isDarkMode, pageType }) => {
   const dispatch = useDispatch();
@@ -34,10 +35,11 @@ const AdminDashboard = ({ isDarkMode, pageType }) => {
 
   // Track when documents are loaded for the first time
   useEffect(() => {
+    dispatch(fetchUsersRequest());
     if (documents && documents.length > 0) {
       setIsInitialLoad(false);
     }
-  }, [documents]);
+  }, [documents, dispatch]);
 
   const handleDocumentSelect = (document) => {
     dispatch(selectDocument(document));
@@ -47,7 +49,7 @@ const AdminDashboard = ({ isDarkMode, pageType }) => {
       id: document.id,
       status: "total question",
     }));
-    dispatch(fetchAssignedReviewersRequest(document.id));
+    dispatch(fetchAssignedReviewersRequest({ documentId: document.id }));
 
     setTimeout(() => {
       documentAnalysisRef.current?.scrollIntoView({

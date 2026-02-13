@@ -191,7 +191,7 @@ function* deleteQuestionWorker(action) {
       status: "total question"
     }));
 
-    yield put(fetchAssignedReviewersRequest(rfpId));
+    yield put(fetchAssignedReviewersRequest({ documentId: rfpId }));
 
     yield put(fetchFilterDataRequest(rfpId));
 

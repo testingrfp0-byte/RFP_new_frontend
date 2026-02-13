@@ -5,33 +5,36 @@ import {
   setQuestionFilter,
 } from "../../features/modules/questions/questionsSlice";
 import {
-  selectQuestionsStatusCounts,
   selectCurrentQuestionFilter,
-  selectAssignedQuestions, // Added
+  selectAssignedQuestions,
 } from "../../features/modules/questions/selectors";
-import { selectSelectedDocument } from "../../features/modules/documents/selectors"; // Added
 
 const FilterStatus = ({ isDarkMode }) => {
   const dispatch = useDispatch();
-
-  const assignedQuestions = useSelector(selectAssignedQuestions); // Use full list
-  const selectedDocument = useSelector(selectSelectedDocument); // Sync with selected doc
+  const assignedQuestions = useSelector(selectAssignedQuestions);
   const currentFilter = useSelector(selectCurrentQuestionFilter);
 
-  // Calculate counts locally to ensure they stay in sync with UI updates
+  // Calculate counts from ALL assigned questions (not filtered by document)
   const statusCounts = React.useMemo(() => {
-    // Filter questions by document if one is selected
-    const questionsToCount = selectedDocument
-      ? assignedQuestions.filter((q) => q.rfp_id === selectedDocument.rfp_id)
-      : assignedQuestions;
+    if (!assignedQuestions) {
+      return {
+        submitted: 0,
+        notSubmitted: 0,
+        process: 0,
+        total: 0,
+      };
+    }
+
+    // Filter out deleted questions
+    const activeQuestions = assignedQuestions.filter((q) => q.is_deleted === false);
 
     return {
-      submitted: questionsToCount.filter((q) => q.is_submitted || q.submit_status === "submitted").length,
-      notSubmitted: questionsToCount.filter((q) => q.submit_status === "not submitted").length,
-      process: questionsToCount.filter((q) => q.submit_status === "process").length,
-      total: questionsToCount.length,
+      submitted: activeQuestions.filter((q) => q.submit_status === "submitted").length,
+      notSubmitted: activeQuestions.filter((q) => q.submit_status === "not submitted").length,
+      process: activeQuestions.filter((q) => q.submit_status === "process").length,
+      total: activeQuestions.length,
     };
-  }, [assignedQuestions, selectedDocument]);
+  }, [assignedQuestions]);
 
   useEffect(() => {
     dispatch(fetchFilterQuestionsRequest());
