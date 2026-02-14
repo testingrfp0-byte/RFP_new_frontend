@@ -46,13 +46,14 @@ function* generateAnswerWorker(action) {
     );
 
     const answer =
+      response.data?.new_answer_version?.answer ||
       response.data.answer ||
       response.data.generated_answer ||
       response.data.response ||
       "";
 
     // Extract answer_id from response if available
-    const answerId = response.data.answer_id || response.data.id || null;
+    const answerId = response.data?.new_answer_version?.id || response.data.answer_id || response.data.id || null;
 
     yield put(
       updateQuestionLocally({
@@ -252,15 +253,16 @@ function* submitChatPromptWorker(action) {
       }
     );
 
-    // Extract answer_id if returned from API
-    const answerId = response.data?.answer_id || null;
+    // Extract answer and answer_id if returned from API
+    const answer = response.data?.new_answer_version?.answer || response.data?.answer;
+    const answerId = response.data?.new_answer_version?.id || response.data?.answer_id || null;
 
-    if (response.data?.answer) {
+    if (answer) {
       yield put(
         updateQuestionLocally({
           questionId: quesId,
           updates: {
-            answer: response.data.answer,
+            answer: answer,
             answer_id: answerId,  // Update answer_id
             submit_status: "process"  // Set status to process
           },
