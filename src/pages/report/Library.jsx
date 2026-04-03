@@ -209,32 +209,26 @@ export default function Library() {
     setUploadProgress((prev) => ({ ...prev, [fileKey]: 0 }));
 
     const progressInterval = setInterval(() => {
-      setUploadProgress((prev) => ({
-        ...prev,
-        [fileKey]: Math.min((prev[fileKey] || 0) + 10, 90),
-      }));
+      setUploadProgress((prev) => {
+        const current = prev[fileKey] || 0;
+        if (current < 90) {
+          return { ...prev, [fileKey]: current + 5 };
+        } else if (current < 99) {
+          return { ...prev, [fileKey]: current + 0.5 };
+        }
+        return prev;
+      });
     }, 200);
 
-    // Cleanup function to ensure consistent removal
     const cleanup = () => {
       clearInterval(progressInterval);
-
-      // Use functional updates to avoid stale state
       setUploadProgress((prev) => {
         const copy = { ...prev };
         delete copy[fileKey];
         return copy;
       });
-
-      setUploadingFiles((prev) =>
-        prev.filter((f) => f.fileKey !== fileKey)
-      );
+      setUploadingFiles((prev) => prev.filter((f) => f.fileKey !== fileKey));
     };
-
-    // Fallback timeout
-    const fallbackTimeout = setTimeout(() => {
-      cleanup();
-    }, 30000);
 
     dispatch({
       type: UPLOAD_LIBRARY_REQUEST,
@@ -243,17 +237,10 @@ export default function Library() {
         category,
         projectName,
         onSuccess: () => {
-          clearTimeout(fallbackTimeout);
           setNewProjectName("");
-          // Single cleanup call with small delay
-          // setTimeout(() => {
-          //   cleanup();
-          // }, 50);
-          // Immediate cleanup
           cleanup();
         },
         onError: () => {
-          clearTimeout(fallbackTimeout);
           cleanup();
         },
       },
