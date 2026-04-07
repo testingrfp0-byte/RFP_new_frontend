@@ -6,6 +6,7 @@ const initialState = {
   clean: [],
   trainingMaterials: [],
   learningDocuments: [],
+  backgroundMaterials: [],
   loading: false,
   error: null,
 };
@@ -28,11 +29,14 @@ const librarySlice = createSlice({
 
         state.historicRFPs = data.filter((d) => d.category === "history");
         state.clean = data.filter((d) => d.category === "clean");
-        state.trainingMaterials = data.filter(
-          (d) => d.category === "training"
-        );
-        state.learningDocuments = data.filter(
-          (d) => d.category === "learning"
+        state.trainingMaterials = data.filter((d) => d.category === "training");
+        state.learningDocuments = data.filter((d) => d.category === "learning");
+        state.backgroundMaterials = data.filter(
+          (d) =>
+            d.category === "Client and Industry Background" ||
+            d.category === "client_industry_background" ||
+            d.category === "Client_and_Industry_Background" ||
+            d.category === "client and industry background",
         );
       })
       .addCase(TYPES.FETCH_LIBRARY_FAILURE, (state, action) => {
@@ -62,7 +66,6 @@ const librarySlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       });
-
   },
 });
 

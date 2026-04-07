@@ -64,6 +64,9 @@ function* uploadLibrarySaga(action) {
     if (category === "history") {
       formData.append("file", file);
       formData.append("project_name", projectName);
+    } else if (category === "Client and Industry Background") {
+      formData.append("file", file);
+      formData.append("project_name", projectName);
     } else {
       formData.append("files", file);
       formData.append("category", category);
@@ -73,7 +76,9 @@ function* uploadLibrarySaga(action) {
     const url =
       category === "history"
         ? LIBRARY_URLS.ANALYZE
-        : LIBRARY_URLS.UPLOAD;
+        : category === "Client and Industry Background"
+          ? LIBRARY_URLS.UPLOAD_BACKGROUND
+          : LIBRARY_URLS.UPLOAD;
 
     const res = yield call(api.post, url, formData, {
       headers: {

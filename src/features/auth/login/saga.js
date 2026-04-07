@@ -19,7 +19,7 @@ function* loginUserSaga(action) {
 
   try {
     yield put(loginRequest());
-
+    console.log("API_BASE_URL", AUTH_URLS.LOGIN);
     const loginRes = yield call(postAPI, AUTH_URLS.LOGIN, {
       email: email,
       password: password,
@@ -31,7 +31,7 @@ function* loginUserSaga(action) {
       try {
         const userDetailsRes = yield call(getAPI, AUTH_URLS.USER_DETAILS);
         const user = userDetailsRes.data.find(
-          (u) => u.email === email || u.username === email
+          (u) => u.email === email || u.username === email,
         );
         userRole = user?.role || "reviewer";
       } catch {
@@ -47,13 +47,13 @@ function* loginUserSaga(action) {
         role: userRole,
         userId: loginRes.data.user_id,
         image_url: loginRes.data.image_url,
-      })
+      }),
     );
 
     if (rememberMe) {
       localStorage.setItem(
         "savedCredentials",
-        JSON.stringify({ email, password, rememberMe: true })
+        JSON.stringify({ email, password, rememberMe: true }),
       );
     } else {
       localStorage.removeItem("savedCredentials");
@@ -65,7 +65,7 @@ function* loginUserSaga(action) {
       loginSuccess({
         ...loginRes.data,
         role: userRole,
-      })
+      }),
     );
 
     toast.success("Login successful! Redirecting...", {

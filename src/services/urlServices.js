@@ -91,6 +91,7 @@ export const LIBRARY_URLS = {
   VIEW: (rfpId) => `${API_BASE_URL}/rfp-documents/${rfpId}/view`,
   ANALYZE: `${API_BASE_URL}/search-related-summary/`,
   UPLOAD: `${API_BASE_URL}/upload-library`,
+  UPLOAD_BACKGROUND: `${API_BASE_URL}/upload-client-industry-background`,
 };
 
 export const RFP_REPORT_URLS = {
