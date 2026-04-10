@@ -549,10 +549,12 @@ export default function EditApproveResponse() {
                           }
                         >
                           <div className="flex items-start gap-3 flex-1">
-                            <span className="text-purple-400">Q {idx + 1}</span>
+                            <span className="text-purple-400">
+                              Q {questionText.split(' ')[0] || idx + 1}
+                            </span>
                             <span className={`font-medium text-sm ${isDarkMode ? "text-white" : "text-gray-900"
                               }`}>
-                              {questionText}
+                              {questionText.substring(questionText.indexOf(' ') + 1) || questionText}
                             </span>
                           </div>
 
