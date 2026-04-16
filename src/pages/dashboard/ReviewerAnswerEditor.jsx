@@ -27,7 +27,7 @@ import {
     fetchFilterQuestionsRequest,
 } from "../../features/modules/questions/questionsSlice";
 
-const ReviewerAnswerEditor = ({ question, isDarkMode }) => {
+const ReviewerAnswerEditor = ({ question, isDarkMode, provider }) => {
     const dispatch = useDispatch();
 
     const isEditing = useSelector(selectIsEditing(question.question_id));
@@ -69,7 +69,7 @@ const ReviewerAnswerEditor = ({ question, isDarkMode }) => {
     };
 
     const handleGenerateAnswer = () => {
-        dispatch(generateAnswerRequest(question.question_id));
+        dispatch(generateAnswerRequest({ questionId: question.question_id, provider: provider }));
         setManualSaved(false);
     };
 

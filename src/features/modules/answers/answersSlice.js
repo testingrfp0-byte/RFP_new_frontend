@@ -24,7 +24,11 @@ const answersSlice = createSlice({
   initialState,
   reducers: {
     generateAnswerRequest: (state, action) => {
-      state.generating[action.payload] = true;
+      const questionId =
+        typeof action.payload === "object"
+          ? action.payload.questionId
+          : action.payload;
+      state.generating[questionId] = true;
     },
     generateAnswerSuccess: (state, action) => {
       state.generating[action.payload.questionId] = false;

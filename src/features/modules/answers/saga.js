@@ -37,12 +37,16 @@ import {
 import { updateQuestionLocally, fetchAssignedQuestionsRequest } from "../questions/questionsSlice";
 
 function* generateAnswerWorker(action) {
-  const questionId = action.payload;
+  const { questionId, provider } =
+    typeof action.payload === "object"
+      ? action.payload
+      : { questionId: action.payload, provider: null };
 
   try {
     const response = yield call(
       api.get,
-      ANSWER_URLS.GENERATE(questionId)
+      ANSWER_URLS.GENERATE(questionId),
+      { params: { provider } }
     );
 
     const answer =

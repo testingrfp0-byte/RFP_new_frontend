@@ -1,4 +1,4 @@
-import { call, put, takeLatest, takeEvery  } from "redux-saga/effects";
+import { call, put, takeLatest, takeEvery } from "redux-saga/effects";
 import api from "../../services/apiHelper";
 import * as TYPES from "./libraryType";
 import { LIBRARY_URLS } from "../../services/urlServices";
@@ -57,7 +57,7 @@ function* viewLibrarySaga(action) {
 }
 
 function* uploadLibrarySaga(action) {
-  const { file, category, projectName, onSuccess, onError } = action.payload;
+  const { file, category, projectName, onSuccess, onError, provider } = action.payload;
 
   try {
     const formData = new FormData();
@@ -73,6 +73,10 @@ function* uploadLibrarySaga(action) {
       formData.append("project_name", projectName);
     }
 
+    if (provider && category !== "Client and Industry Background") {
+      formData.append("provider", provider);
+    }
+
     const url =
       category === "history"
         ? LIBRARY_URLS.ANALYZE
@@ -86,7 +90,6 @@ function* uploadLibrarySaga(action) {
       },
     });
 
-    // Check for duplicate status (208) or explicit error status in response
     if (res.status === 208 || res.data?.status === 'error') {
       const error = new Error("Duplicate or Error");
       error.response = res;
@@ -98,10 +101,8 @@ function* uploadLibrarySaga(action) {
     let successMessage;
 
     if (category === "history") {
-      // For /search-related-summary/ API, hardcode success message as it may not return proper message
       successMessage = "Uploaded Successfully";
     } else {
-      // For /upload-library API, use response message
       successMessage =
         res?.data?.message ||
         res?.data?.detail ||
@@ -125,7 +126,6 @@ function* uploadLibrarySaga(action) {
       error.message ||
       `Failed to upload ${file.name}`;
 
-    // Handle specific nested duplicate error structure
     if (
       error.response?.status === 208 ||
       (error.response?.data?.message?.status === "duplicate" && error.response?.data?.message?.message)

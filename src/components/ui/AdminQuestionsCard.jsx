@@ -28,7 +28,7 @@ import {
     fetchFilterQuestionsRequest,
 } from "../../features/modules/questions/questionsSlice";
 
-const AdminQuestionCard = ({ question, idx, expandedQuestion, setExpandedQuestion }) => {
+const AdminQuestionCard = ({ question, idx, expandedQuestion, setExpandedQuestion, provider }) => {
     const { isDarkMode } = useTheme();
     const dispatch = useDispatch();
     const isEditing = useSelector(selectIsEditing(question.question_id));
@@ -70,7 +70,7 @@ const AdminQuestionCard = ({ question, idx, expandedQuestion, setExpandedQuestio
     };
 
     const handleGenerateAnswer = () => {
-        dispatch(generateAnswerRequest(question.question_id));
+        dispatch(generateAnswerRequest({ questionId: question.question_id, provider: provider }));
         setManualSaved(false);
     };
 

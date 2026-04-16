@@ -27,6 +27,7 @@ const SelfAssignDashboard = () => {
     const [expandedQuestion, setExpandedQuestion] = useState(null);
     const [toasterNotification, setToasterNotification] = useState(null);
     const [initialLoad, setInitialLoad] = useState(true);
+    const [selectedProvider, setSelectedProvider] = useState("openai");
     const reduxLoading = useSelector(selectQuestionsLoading);
 
     useEffect(() => {
@@ -150,37 +151,63 @@ const SelfAssignDashboard = () => {
                     className={`p-6 rounded-xl shadow-xl mb-6 ${isDarkMode ? "bg-gray-800 border border-gray-600" : "bg-white"
                         }`}
                 >
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="w-2 h-8 bg-purple-500 rounded-full" />
-                        <h2
-                            className={`text-xl font-semibold ${isDarkMode ? "text-white" : "text-gray-900"
-                                }`}
-                        >
-                            Responses in Process
-                        </h2>
-                        {currentFilter === "all" && (
-                            <span className="bg-purple-500/20 text-purple-400 px-2 py-1 rounded-full text-xs">
-                                {totalQuestionsCount} questions
-                            </span>
-                        )}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                        <div className="flex items-center gap-3">
+                            <div className="w-2 h-8 bg-purple-500 rounded-full" />
+                            <h2
+                                className={`text-xl font-semibold ${isDarkMode ? "text-white" : "text-gray-900"
+                                    }`}
+                            >
+                                Responses in Process
+                            </h2>
+                            {currentFilter === "all" && (
+                                <span className="bg-purple-500/20 text-purple-400 px-2 py-1 rounded-full text-xs">
+                                    {totalQuestionsCount} questions
+                                </span>
+                            )}
 
-                        {currentFilter === "submitted" && (
-                            <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                                Submitted: <b>{submittedCount}</b>
-                            </span>
-                        )}
+                            {currentFilter === "submitted" && (
+                                <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                                    Submitted: <b>{submittedCount}</b>
+                                </span>
+                            )}
 
-                        {currentFilter === "not submitted" && (
-                            <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs">
-                                Not for me: <b>{notSubmittedCount}</b>
-                            </span>
-                        )}
+                            {currentFilter === "not submitted" && (
+                                <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs">
+                                    Not for me: <b>{notSubmittedCount}</b>
+                                </span>
+                            )}
 
-                        {currentFilter === "process" && (
-                            <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
-                                Pending: <b>{processCount}</b>
-                            </span>
-                        )}
+                            {currentFilter === "process" && (
+                                <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
+                                    Pending: <b>{processCount}</b>
+                                </span>
+                            )}
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            {/* <label className={`text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                                AI Provider:
+                            </label> */}
+                            <select
+                                value={selectedProvider}
+                                onChange={(e) => setSelectedProvider(e.target.value)}
+                                className={`px-3 py-1.5 rounded-lg border outline-none transition-all focus:ring-2 focus:ring-purple-500/50 appearance-none cursor-pointer text-sm ${isDarkMode
+                                    ? "bg-gray-700 border-gray-600 text-white hover:bg-gray-650"
+                                    : "bg-white border-gray-300 text-gray-900 hover:border-purple-400"
+                                    }`}
+                                style={{
+                                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='${isDarkMode ? "%239ca3af" : "%234b5563"}'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                                    backgroundRepeat: "no-repeat",
+                                    backgroundPosition: "right 0.5rem center",
+                                    backgroundSize: "1rem",
+                                    paddingRight: "2rem",
+                                }}
+                            >
+                                <option value="openai">OpenAI</option>
+                                <option value="claude">Claude</option>
+                            </select>
+                        </div>
                     </div>
 
                     {matchedArray.length === 0 ? (
@@ -273,6 +300,7 @@ const SelfAssignDashboard = () => {
                                                 idx={idx}
                                                 expandedQuestion={expandedQuestion}
                                                 setExpandedQuestion={setExpandedQuestion}
+                                                provider={selectedProvider}
                                             />
                                         ))}
                                 </div>
