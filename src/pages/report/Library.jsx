@@ -32,7 +32,7 @@ export default function Library() {
   const [uploadingFiles, setUploadingFiles] = useState([]);
   const [uploadProgress, setUploadProgress] = useState({});
   const [userRole, setUserRole] = useState("");
-  const [selectedProvider, setSelectedProvider] = useState("openai");
+  const [selectedProvider, setSelectedProvider] = useState("gpt-4o");
   const calledOnceRef = useRef(false);
   const [deleteMessage, setDeleteMessage] = useState("");
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -699,8 +699,14 @@ export default function Library() {
                           paddingRight: "2.5rem",
                         }}
                       >
-                        <option value="openai">OpenAI</option>
-                        <option value="claude">Claude</option>
+                        <option value="gpt-4o">gpt-4o</option>
+                        <option value="gpt-4o-mini">gpt-4o-mini</option>
+                        <option value="gpt-5.4">gpt-5.4</option>
+                        <option value="claude-sonnet-4-6">claude-sonnet-4-6</option>
+                        <option value="claude-opus-4-6">claude-opus-4-6</option>
+                        <option value="claude-haiku-4-5-20251001">
+                          claude-haiku-4-5-20251001
+                        </option>
                       </select>
                     </div>
                   </div>
