@@ -27,6 +27,7 @@ export default function Library() {
   const [availableProjects, setAvailableProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState("");
   const [newProjectName, setNewProjectName] = useState("");
+  const [customPrompt, setCustomPrompt] = useState("");
   const [showProjectNameError, setShowProjectNameError] = useState(false);
   const [useExistingProject, setUseExistingProject] = useState(false);
   const [uploadingFiles, setUploadingFiles] = useState([]);
@@ -239,8 +240,10 @@ export default function Library() {
         category,
         projectName,
         provider: selectedProvider,
+        customMessage: customPrompt,
         onSuccess: () => {
           setNewProjectName("");
+          setCustomPrompt("");
           cleanup();
         },
         onError: () => {
@@ -479,6 +482,26 @@ export default function Library() {
                 } ${isDarkMode ? "bg-gray-700 text-white" : "bg-white"} ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
             />
           </div>
+
+          {category !== "Client and Industry Background" && (
+            <div>
+              <label
+                className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+              >
+                Chat Prompt
+              </label>
+              <input
+                type="text"
+                placeholder="Enter chat prompt"
+                value={customPrompt}
+                onChange={(e) => setCustomPrompt(e.target.value)}
+                disabled={loading}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 border-gray-300 focus:ring-purple-500 ${isDarkMode ? "bg-gray-700 text-white" : "bg-white"
+                  } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+              />
+            </div>
+          )}
 
           {showProjectNameError && (
             <p className="text-red-500 text-sm">Project name is required</p>
@@ -743,6 +766,22 @@ export default function Library() {
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 focus:ring-purple-500"
                         } ${isDarkMode ? "bg-gray-700 text-white" : "bg-white"}`}
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                        }`}
+                    >
+                      Chat Prompt
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter chat prompt"
+                      value={customPrompt}
+                      onChange={(e) => setCustomPrompt(e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 border-gray-300 focus:ring-purple-500 ${isDarkMode ? "bg-gray-700 text-white" : "bg-white"}`}
                     />
                   </div>
 

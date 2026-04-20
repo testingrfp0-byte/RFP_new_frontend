@@ -57,7 +57,7 @@ function* viewLibrarySaga(action) {
 }
 
 function* uploadLibrarySaga(action) {
-  const { file, category, projectName, onSuccess, onError, provider } = action.payload;
+  const { file, category, projectName, onSuccess, onError, provider, customMessage } = action.payload;
 
   try {
     const formData = new FormData();
@@ -75,6 +75,10 @@ function* uploadLibrarySaga(action) {
 
     if (provider && category !== "Client and Industry Background") {
       formData.append("provider", provider);
+    }
+
+    if (customMessage) {
+      formData.append("custom_message", customMessage);
     }
 
     const url =
