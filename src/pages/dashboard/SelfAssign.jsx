@@ -27,7 +27,7 @@ const SelfAssignDashboard = () => {
     const [expandedQuestion, setExpandedQuestion] = useState(null);
     const [toasterNotification, setToasterNotification] = useState(null);
     const [initialLoad, setInitialLoad] = useState(true);
-    const [selectedProvider, setSelectedProvider] = useState("gpt-4o");
+    const [selectedProvider, setSelectedProvider] = useState("gpt-4o-mini");
     const reduxLoading = useSelector(selectQuestionsLoading);
 
     useEffect(() => {
@@ -204,8 +204,8 @@ const SelfAssignDashboard = () => {
                                     paddingRight: "2rem",
                                 }}
                             >
-                                <option value="gpt-4o">gpt-4o</option>
                                 <option value="gpt-4o-mini">gpt-4o-mini</option>
+                                <option value="gpt-4o">gpt-4o</option>
                                 <option value="gpt-5.4">gpt-5.4</option>
                                 <option value="claude-sonnet-4-6">claude-sonnet-4-6</option>
                                 <option value="claude-opus-4-6">claude-opus-4-6</option>

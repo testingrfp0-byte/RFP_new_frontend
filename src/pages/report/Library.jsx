@@ -33,7 +33,7 @@ export default function Library() {
   const [uploadingFiles, setUploadingFiles] = useState([]);
   const [uploadProgress, setUploadProgress] = useState({});
   const [userRole, setUserRole] = useState("");
-  const [selectedProvider, setSelectedProvider] = useState("gpt-4o");
+  const [selectedProvider, setSelectedProvider] = useState("gpt-4o-mini");
   const calledOnceRef = useRef(false);
   const [deleteMessage, setDeleteMessage] = useState("");
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -483,26 +483,6 @@ export default function Library() {
             />
           </div>
 
-          {category !== "Client and Industry Background" && (
-            <div>
-              <label
-                className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
-                  }`}
-              >
-                Chat Prompt
-              </label>
-              <input
-                type="text"
-                placeholder="Enter chat prompt"
-                value={customPrompt}
-                onChange={(e) => setCustomPrompt(e.target.value)}
-                disabled={loading}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 border-gray-300 focus:ring-purple-500 ${isDarkMode ? "bg-gray-700 text-white" : "bg-white"
-                  } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-              />
-            </div>
-          )}
-
           {showProjectNameError && (
             <p className="text-red-500 text-sm">Project name is required</p>
           )}
@@ -722,8 +702,8 @@ export default function Library() {
                           paddingRight: "2.5rem",
                         }}
                       >
-                        <option value="gpt-4o">gpt-4o</option>
                         <option value="gpt-4o-mini">gpt-4o-mini</option>
+                        <option value="gpt-4o">gpt-4o</option>
                         <option value="gpt-5.4">gpt-5.4</option>
                         <option value="claude-sonnet-4-6">claude-sonnet-4-6</option>
                         <option value="claude-opus-4-6">claude-opus-4-6</option>
@@ -793,18 +773,18 @@ export default function Library() {
                 </div>
 
                 <div
-                  onDragOver={(e) => handleDragOver(e, "history")}
-                  onDragEnter={(e) => handleDragEnter(e, "history")}
-                  onDragLeave={(e) => handleDragLeave(e, "history")}
-                  onDrop={(e) => handleDrop(e, "history")}
-                  className={`rounded-lg p-4 mb-5 border-2 border-dashed transition-colors ${dragOver["history"]
+                  onDragOver={(e) => handleDragOver(e, "upload_new")}
+                  onDragEnter={(e) => handleDragEnter(e, "upload_new")}
+                  onDragLeave={(e) => handleDragLeave(e, "upload_new")}
+                  onDrop={(e) => handleDrop(e, "upload_new")}
+                  className={`rounded-lg p-4 mb-5 border-2 border-dashed transition-colors ${dragOver["upload_new"]
                     ? "border-purple-500 bg-purple-500/10"
                     : isDarkMode
                       ? "border-gray-600 bg-gray-800/50"
                       : "border-gray-300 bg-gray-50/50"
                     } ${uploadingFiles.some(
                       (file) =>
-                        file.category === "history" &&
+                        file.category === "upload_new" &&
                         uploadProgress[file.fileKey] > 0,
                     )
                       ? "cursor-not-allowed opacity-50"
@@ -825,7 +805,7 @@ export default function Library() {
                       className={`text-sm mb-4 ${isDarkMode ? "text-gray-400" : "text-gray-600"
                         }`}
                     >
-                      {dragOver["history"]
+                      {dragOver["upload_new"]
                         ? "Drop files here"
                         : "Drag and drop PDF files here or click to browse"}
                     </p>
@@ -834,10 +814,10 @@ export default function Library() {
                       id="upload-center"
                       className="hidden"
                       accept=".pdf,.doc,.docx,.txt,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,.ppt,.pptx"
-                      onChange={(e) => handleFileUpload(e, "history")}
+                      onChange={(e) => handleFileUpload(e, "upload_new")}
                       disabled={uploadingFiles.some(
                         (file) =>
-                          file.category === "history" &&
+                          file.category === "upload_new" &&
                           uploadProgress[file.fileKey] > 0,
                       )}
                       multiple
@@ -847,7 +827,7 @@ export default function Library() {
                       htmlFor="upload-center"
                       className={`bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer inline-block ${uploadingFiles.some(
                         (file) =>
-                          file.category === "history" &&
+                          file.category === "upload_new" &&
                           uploadProgress[file.fileKey] > 0,
                       )
                         ? "cursor-not-allowed"
@@ -904,7 +884,7 @@ export default function Library() {
                     Historic RFP Responses
                   </h2>
                 </div>
-                {renderUploadSection("clean", "Historic Materials")}
+                {renderUploadSection("history", "Historic Materials")}
 
                 {renderGroupedFiles(
                   groupedCleanFiles,

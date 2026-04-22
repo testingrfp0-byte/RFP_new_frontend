@@ -42,11 +42,11 @@ function* fetchDocumentsWorker() {
 }
 
 function* fetchDocumentDetailsWorker(action) {
-  const { id, status = "total question", onSuccess, onError } = action.payload;
+  const { id, rfp_status = "total question", onSuccess, onError } = action.payload;
   try {
     const response = yield call(
       api.get,
-      `${DOCUMENT_URLS.DETAILS(id)}/${status}`
+      `${DOCUMENT_URLS.DETAILS(id)}/${rfp_status}`
     );
 
     const flattenedQuestions =

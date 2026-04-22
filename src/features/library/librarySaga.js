@@ -61,7 +61,7 @@ function* uploadLibrarySaga(action) {
 
   try {
     const formData = new FormData();
-    if (category === "history") {
+    if (category === "upload_new") {
       formData.append("file", file);
       formData.append("project_name", projectName);
     } else if (category === "Client and Industry Background") {
@@ -77,12 +77,12 @@ function* uploadLibrarySaga(action) {
       formData.append("provider", provider);
     }
 
-    if (customMessage) {
+    if (customMessage && category === "upload_new") {
       formData.append("custom_message", customMessage);
     }
 
     const url =
-      category === "history"
+      category === "upload_new"
         ? LIBRARY_URLS.ANALYZE
         : category === "Client and Industry Background"
           ? LIBRARY_URLS.UPLOAD_BACKGROUND
@@ -104,7 +104,7 @@ function* uploadLibrarySaga(action) {
 
     let successMessage;
 
-    if (category === "history") {
+    if (category === "upload_new") {
       successMessage = "Uploaded Successfully";
     } else {
       successMessage =
