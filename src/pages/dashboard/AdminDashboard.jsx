@@ -61,7 +61,7 @@ const AdminDashboard = ({ isDarkMode, pageType }) => {
 
   const historyDocuments = useMemo(() => {
     return (documents || []).filter(
-      (doc) => doc.category === "history"
+      (doc) => doc.category === "history" || doc.category === "clean"
     );
   }, [documents]);
 

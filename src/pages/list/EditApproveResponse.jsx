@@ -62,7 +62,7 @@ export default function EditApproveResponse() {
 
   const historyPdfList = useMemo(() => {
     return (pdfList || []).filter(
-      (pdf) => pdf.category === "history"
+      (pdf) => pdf.category === "history" || pdf.category === "clean"
     );
   }, [pdfList]);
 

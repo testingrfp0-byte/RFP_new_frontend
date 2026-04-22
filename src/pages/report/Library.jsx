@@ -884,7 +884,7 @@ export default function Library() {
                     Historic RFP Responses
                   </h2>
                 </div>
-                {renderUploadSection("history", "Historic Materials")}
+                {renderUploadSection("clean", "Historic Materials")}
 
                 {renderGroupedFiles(
                   groupedCleanFiles,

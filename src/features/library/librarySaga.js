@@ -57,7 +57,12 @@ function* viewLibrarySaga(action) {
 }
 
 function* uploadLibrarySaga(action) {
-  const { file, category, projectName, onSuccess, onError, provider, customMessage } = action.payload;
+  let { file, category, projectName, onSuccess, onError, provider, customMessage } = action.payload;
+
+  // Convert history to clean for the API payload as per user request
+  if (category === "history") {
+    category = "clean";
+  }
 
   try {
     const formData = new FormData();
