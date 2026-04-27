@@ -28,7 +28,7 @@ import {
     fetchFilterQuestionsRequest,
 } from "../../features/modules/questions/questionsSlice";
 
-const AdminQuestionCard = ({ question, idx, expandedQuestion, setExpandedQuestion, provider }) => {
+const AdminQuestionCard = ({ question, idx, expandedQuestion, setExpandedQuestion, provider, onProviderError }) => {
     const { isDarkMode } = useTheme();
     const dispatch = useDispatch();
     const isEditing = useSelector(selectIsEditing(question.question_id));
@@ -70,6 +70,11 @@ const AdminQuestionCard = ({ question, idx, expandedQuestion, setExpandedQuestio
     };
 
     const handleGenerateAnswer = () => {
+        if (!provider) {
+            if (onProviderError) onProviderError(true);
+            toast.error("AI Provider is required");
+            return;
+        }
         dispatch(generateAnswerRequest({ questionId: question.question_id, provider: provider }));
         setManualSaved(false);
     };

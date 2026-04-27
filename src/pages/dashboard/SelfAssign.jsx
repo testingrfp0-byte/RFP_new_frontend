@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import ToasterNotification from "../../components/ui/ToasterNotification";
+import { toast } from "react-toastify";
 import {
     fetchAssignedQuestionsRequest,
     fetchFilterQuestionsRequest
@@ -27,7 +28,8 @@ const SelfAssignDashboard = () => {
     const [expandedQuestion, setExpandedQuestion] = useState(null);
     const [toasterNotification, setToasterNotification] = useState(null);
     const [initialLoad, setInitialLoad] = useState(true);
-    const [selectedProvider, setSelectedProvider] = useState("gpt-4o-mini");
+    const [selectedProvider, setSelectedProvider] = useState("");
+    const [showProviderError, setShowProviderError] = useState(false);
     const reduxLoading = useSelector(selectQuestionsLoading);
 
     useEffect(() => {
@@ -189,28 +191,42 @@ const SelfAssignDashboard = () => {
                             {/* <label className={`text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
                                 AI Provider:
                             </label> */}
-                            <select
-                                value={selectedProvider}
-                                onChange={(e) => setSelectedProvider(e.target.value)}
-                                className={`px-3 py-1.5 rounded-lg border outline-none transition-all focus:ring-2 focus:ring-purple-500/50 appearance-none cursor-pointer text-sm ${isDarkMode
-                                    ? "bg-gray-700 border-gray-600 text-white hover:bg-gray-650"
-                                    : "bg-white border-gray-300 text-gray-900 hover:border-purple-400"
-                                    }`}
-                                style={{
-                                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='${isDarkMode ? "%239ca3af" : "%234b5563"}'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
-                                    backgroundRepeat: "no-repeat",
-                                    backgroundPosition: "right 0.5rem center",
-                                    backgroundSize: "1rem",
-                                    paddingRight: "2rem",
-                                }}
-                            >
-                                <option value="gpt-4o-mini">gpt-4o-mini</option>
-                                <option value="gpt-4o">gpt-4o</option>
-                                <option value="gpt-5.4">gpt-5.4</option>
-                                <option value="claude-sonnet-4-6">claude-sonnet-4-6</option>
-                                <option value="claude-opus-4-6">claude-opus-4-6</option>
-                                <option value="claude-haiku-4-5-20251001">claude-haiku-4-5-20251001</option>
-                            </select>
+                            <div className="flex flex-col">
+                                <select
+                                    value={selectedProvider}
+                                    onChange={(e) => {
+                                        setSelectedProvider(e.target.value);
+                                        if (e.target.value) setShowProviderError(false);
+                                    }}
+                                    className={`px-3 py-1.5 rounded-lg border outline-none transition-all focus:ring-2 appearance-none cursor-pointer text-sm ${isDarkMode
+                                        ? "bg-gray-700 border-gray-600 text-white hover:bg-gray-650"
+                                        : "bg-white border-gray-300 text-gray-900 hover:border-purple-400"
+                                        } ${showProviderError
+                                            ? "border-red-500 focus:ring-red-500"
+                                            : "focus:ring-purple-500/50"
+                                        }`}
+                                    style={{
+                                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='${isDarkMode ? "%239ca3af" : "%234b5563"}'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                                        backgroundRepeat: "no-repeat",
+                                        backgroundPosition: "right 0.5rem center",
+                                        backgroundSize: "1rem",
+                                        paddingRight: "2rem",
+                                    }}
+                                >
+                                    <option value="">Select AI Provider</option>
+                                    <option value="gpt-4o-mini">gpt-4o-mini</option>
+                                    <option value="gpt-4o">gpt-4o</option>
+                                    <option value="gpt-5.4">gpt-5.4</option>
+                                    <option value="claude-sonnet-4-6">claude-sonnet-4-6</option>
+                                    <option value="claude-opus-4-6">claude-opus-4-6</option>
+                                    <option value="claude-haiku-4-5-20251001">claude-haiku-4-5-20251001</option>
+                                </select>
+                                {showProviderError && (
+                                    <p className="text-red-500 text-[10px] mt-1 ml-1">
+                                        AI Provider is required
+                                    </p>
+                                )}
+                            </div>
                         </div>
                     </div>
 
@@ -257,6 +273,11 @@ const SelfAssignDashboard = () => {
                                                     : ""
                                                 }`}
                                             onClick={() => {
+                                                if (!selectedProvider) {
+                                                    setShowProviderError(true);
+                                                    toast.error("AI Provider is required");
+                                                    return;
+                                                }
                                                 setSelectedPdf(pdf);
                                                 setTimeout(
                                                     () =>
@@ -305,6 +326,7 @@ const SelfAssignDashboard = () => {
                                                 expandedQuestion={expandedQuestion}
                                                 setExpandedQuestion={setExpandedQuestion}
                                                 provider={selectedProvider}
+                                                onProviderError={setShowProviderError}
                                             />
                                         ))}
                                 </div>

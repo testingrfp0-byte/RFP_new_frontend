@@ -33,7 +33,8 @@ export default function Library() {
   const [uploadingFiles, setUploadingFiles] = useState([]);
   const [uploadProgress, setUploadProgress] = useState({});
   const [userRole, setUserRole] = useState("");
-  const [selectedProvider, setSelectedProvider] = useState("gpt-4o-mini");
+  const [selectedProvider, setSelectedProvider] = useState("");
+  const [showProviderError, setShowProviderError] = useState(false);
   const calledOnceRef = useRef(false);
   const [deleteMessage, setDeleteMessage] = useState("");
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -171,7 +172,14 @@ export default function Library() {
       return;
     }
 
+    if (!selectedProvider) {
+      setShowProviderError(true);
+      toast.error("AI Provider is required");
+      return;
+    }
+
     setShowProjectNameError(false);
+    setShowProviderError(false);
 
     const newUploadingFiles = Array.from(files).map((file) => ({
       name: file.name,
@@ -198,7 +206,15 @@ export default function Library() {
       return;
     }
 
+    if (!selectedProvider) {
+      setShowProviderError(true);
+      toast.error("AI Provider is required");
+      event.target.value = "";
+      return;
+    }
+
     setShowProjectNameError(false);
+    setShowProviderError(false);
 
     const files = event.target.files;
     if (files && files.length > 0) {
@@ -689,10 +705,16 @@ export default function Library() {
                       </label>
                       <select
                         value={selectedProvider}
-                        onChange={(e) => setSelectedProvider(e.target.value)}
-                        className={`w-full sm:w-64 px-4 py-2 rounded-lg border outline-none transition-all focus:ring-2 focus:ring-purple-500/50 appearance-none cursor-pointer ${isDarkMode
+                        onChange={(e) => {
+                          setSelectedProvider(e.target.value);
+                          if (e.target.value) setShowProviderError(false);
+                        }}
+                        className={`w-full sm:w-64 px-4 py-2 rounded-lg border outline-none transition-all focus:ring-2 appearance-none cursor-pointer ${isDarkMode
                           ? "bg-gray-700 border-gray-600 text-white hover:bg-gray-650"
                           : "bg-white border-gray-300 text-gray-900 hover:border-purple-400"
+                          } ${showProviderError
+                            ? "border-red-500 focus:ring-red-500"
+                            : "focus:ring-purple-500/50"
                           }`}
                         style={{
                           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='${isDarkMode ? "%239ca3af" : "%234b5563"}'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
@@ -702,6 +724,7 @@ export default function Library() {
                           paddingRight: "2.5rem",
                         }}
                       >
+                        <option value="">Select AI Provider</option>
                         <option value="gpt-4o-mini">gpt-4o-mini</option>
                         <option value="gpt-4o">gpt-4o</option>
                         <option value="gpt-5.4">gpt-5.4</option>
@@ -711,6 +734,11 @@ export default function Library() {
                           claude-haiku-4-5-20251001
                         </option>
                       </select>
+                      {showProviderError && (
+                        <p className="text-red-500 text-xs mt-1">
+                          AI Provider is required
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
