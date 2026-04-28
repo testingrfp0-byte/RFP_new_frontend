@@ -27,7 +27,7 @@ import {
     fetchFilterQuestionsRequest,
 } from "../../features/modules/questions/questionsSlice";
 
-const ReviewerAnswerEditor = ({ question, isDarkMode, provider }) => {
+const ReviewerAnswerEditor = ({ question, isDarkMode, provider, onProviderError }) => {
     const dispatch = useDispatch();
 
     const isEditing = useSelector(selectIsEditing(question.question_id));
@@ -69,6 +69,11 @@ const ReviewerAnswerEditor = ({ question, isDarkMode, provider }) => {
     };
 
     const handleGenerateAnswer = () => {
+        if (!provider) {
+            if (onProviderError) onProviderError(true);
+            toast.error("AI Provider is required");
+            return;
+        }
         dispatch(generateAnswerRequest({ questionId: question.question_id, provider: provider }));
         setManualSaved(false);
     };

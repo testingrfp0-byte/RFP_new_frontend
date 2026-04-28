@@ -1,5 +1,5 @@
 import { call, put, takeEvery } from "redux-saga/effects";
-import api from "../../../services/apiHelper";
+import api, { getAPI, patchAPI, postAPI } from "../../../services/apiHelper";
 import { ANSWER_URLS } from "../../../services/urlServices";
 import { toast } from "react-toastify";
 
@@ -44,7 +44,7 @@ function* generateAnswerWorker(action) {
 
   try {
     const response = yield call(
-      api.get,
+      getAPI,
       ANSWER_URLS.GENERATE(questionId),
       { params: { provider } }
     );
@@ -92,7 +92,7 @@ function* updateAnswerWorker(action) {
   const { questionId, answer } = action.payload;
   try {
     const response = yield call(
-      api.patch,
+      patchAPI,
       ANSWER_URLS.UPDATE(questionId),
       { answer }
     );
@@ -115,7 +115,7 @@ function* submitAnswerWorker(action) {
   const { questionId, answer } = action.payload;
   try {
     yield call(
-      api.patch,
+      patchAPI,
       ANSWER_URLS.SUBMIT,
       { answer }, // Body
       {
@@ -151,7 +151,7 @@ function* notForMeWorker(action) {
   const questionId = action.payload;
   try {
     yield call(
-      api.patch,
+      patchAPI,
       ANSWER_URLS.SUBMIT,
       {}, // Empty body
       {
@@ -193,7 +193,7 @@ function* fetchVersionsWorker(action) {
   const questionId = action.payload;
   try {
     const response = yield call(
-      api.get,
+      getAPI,
       ANSWER_URLS.VERSIONS(questionId)
     );
 
@@ -217,7 +217,7 @@ function* analyzeAnswerWorker(action) {
 
   try {
     const response = yield call(
-      api.post,
+      postAPI,
       ANSWER_URLS.ANALYZE,
       null,
       {
@@ -248,7 +248,7 @@ function* submitChatPromptWorker(action) {
 
   try {
     const response = yield call(
-      api.post,
+      postAPI,
       ANSWER_URLS.CHAT_PROMPT,
       {
         ques_id: quesId,

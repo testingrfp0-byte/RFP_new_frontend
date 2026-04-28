@@ -172,7 +172,7 @@ export default function Library() {
       return;
     }
 
-    if (!selectedProvider) {
+    if (category === "upload_new" && !selectedProvider) {
       setShowProviderError(true);
       toast.error("AI Provider is required");
       return;
@@ -206,7 +206,7 @@ export default function Library() {
       return;
     }
 
-    if (!selectedProvider) {
+    if (category === "upload_new" && !selectedProvider) {
       setShowProviderError(true);
       toast.error("AI Provider is required");
       event.target.value = "";

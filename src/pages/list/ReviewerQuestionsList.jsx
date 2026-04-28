@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import QuestionCard from "../../components/ui/ReviewerQuestionCard";
+import { toast } from "react-toastify";
 
 import {
   selectAssignedQuestions,
@@ -16,6 +17,8 @@ const ReviewerQuestionsList = ({ isDarkMode, selfAssignMode }) => {
   const currentFilter = useSelector(selectCurrentQuestionFilter);
   const selectedDocument = useSelector(selectSelectedDocument);
   const [selectedDocKey, setSelectedDocKey] = useState(null);
+  const [selectedProvider, setSelectedProvider] = useState("");
+  const [showProviderError, setShowProviderError] = useState(false);
   const filteredQuestions = assignedQuestions.filter((q) => {
     if (selectedDocument && q.rfp_id !== selectedDocument.rfp_id) {
       return false;
@@ -65,9 +68,10 @@ const ReviewerQuestionsList = ({ isDarkMode, selfAssignMode }) => {
     // 1. No document is currently selected
     // 2. Documents are available
     // 3. Questions exist
-    if (!selectedDocKey && documents.length > 0 && filteredQuestions.length > 0) {
-      setSelectedDocKey(documents[0][0]);
-    }
+    // Commented out to match SelfAssign behavior where provider is required before selection
+    // if (!selectedDocKey && documents.length > 0 && filteredQuestions.length > 0) {
+    //   setSelectedDocKey(documents[0][0]);
+    // }
   }, [documentGroups, selectedDocKey, filteredQuestions.length]);
 
   // Calculate counts from ALL assigned questions (not filtered by status)
@@ -141,37 +145,78 @@ const ReviewerQuestionsList = ({ isDarkMode, selfAssignMode }) => {
         : "bg-white border border-gray-200"
         }`}
     >
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-2 h-8 bg-purple-500 rounded-full" />
-        <h2
-          className={`text-xl font-semibold ${isDarkMode ? "text-white" : "text-gray-900"
-            }`}
-        >
-          Responses in Process
-        </h2>
-        {currentFilter === "all" && (
-          <span className="bg-purple-500/20 text-purple-400 px-2 py-1 rounded-full text-xs">
-            {totalQuestionsCount} questions
-          </span>
-        )}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-2 h-8 bg-purple-500 rounded-full" />
+          <h2
+            className={`text-xl font-semibold ${isDarkMode ? "text-white" : "text-gray-900"
+              }`}
+          >
+            Responses in Process
+          </h2>
+          {currentFilter === "all" && (
+            <span className="bg-purple-500/20 text-purple-400 px-2 py-1 rounded-full text-xs">
+              {totalQuestionsCount} questions
+            </span>
+          )}
 
-        {currentFilter === "submitted" && (
-          <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-            Submitted: <b>{submittedCount}</b>
-          </span>
-        )}
+          {currentFilter === "submitted" && (
+            <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+              Submitted: <b>{submittedCount}</b>
+            </span>
+          )}
 
-        {currentFilter === "not submitted" && (
-          <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs">
-            Not for me: <b>{notSubmittedCount}</b>
-          </span>
-        )}
+          {currentFilter === "not submitted" && (
+            <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs">
+              Not for me: <b>{notSubmittedCount}</b>
+            </span>
+          )}
 
-        {currentFilter === "process" && (
-          <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
-            Pending: <b>{processCount}</b>
-          </span>
-        )}
+          {currentFilter === "process" && (
+            <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
+              Pending: <b>{processCount}</b>
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2">
+            <div className="flex flex-col">
+                <select
+                    value={selectedProvider}
+                    onChange={(e) => {
+                        setSelectedProvider(e.target.value);
+                        if (e.target.value) setShowProviderError(false);
+                    }}
+                    className={`px-3 py-1.5 rounded-lg border outline-none transition-all focus:ring-2 appearance-none cursor-pointer text-sm ${isDarkMode
+                        ? "bg-gray-700 border-gray-600 text-white hover:bg-gray-650"
+                        : "bg-white border-gray-300 text-gray-900 hover:border-purple-400"
+                        } ${showProviderError
+                            ? "border-red-500 focus:ring-red-500"
+                            : "focus:ring-purple-500/50"
+                        }`}
+                    style={{
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='${isDarkMode ? "%239ca3af" : "%234b5563"}'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                        backgroundRepeat: "no-repeat",
+                        backgroundPosition: "right 0.5rem center",
+                        backgroundSize: "1rem",
+                        paddingRight: "2rem",
+                    }}
+                >
+                    <option value="">Select AI Provider</option>
+                    <option value="gpt-4o-mini">gpt-4o-mini</option>
+                    <option value="gpt-4o">gpt-4o</option>
+                    <option value="gpt-5.4">gpt-5.4</option>
+                    <option value="claude-sonnet-4-6">claude-sonnet-4-6</option>
+                    <option value="claude-opus-4-6">claude-opus-4-6</option>
+                    <option value="claude-haiku-4-5-20251001">claude-haiku-4-5-20251001</option>
+                </select>
+                {showProviderError && (
+                    <p className="text-red-500 text-[10px] mt-1 ml-1">
+                        AI Provider is required
+                    </p>
+                )}
+            </div>
+        </div>
       </div>
 
       {/* Show empty state inside the box */}
@@ -206,7 +251,14 @@ const ReviewerQuestionsList = ({ isDarkMode, selfAssignMode }) => {
               return (
                 <div
                   key={docKey}
-                  onClick={() => setSelectedDocKey(docKey)}
+                  onClick={() => {
+                      if (!selectedProvider) {
+                          setShowProviderError(true);
+                          toast.error("AI Provider is required");
+                          return;
+                      }
+                      setSelectedDocKey(docKey);
+                  }}
                   className={`min-w-[260px] cursor-pointer rounded-xl p-5 border-2 transition-all border ${isSelected
                     ? isDarkMode
                       ? "border-4 bg-gray-600/40 border-purple-500"
@@ -254,6 +306,8 @@ const ReviewerQuestionsList = ({ isDarkMode, selfAssignMode }) => {
                     index={index}
                     isDarkMode={isDarkMode}
                     isReviewerMode
+                    provider={selectedProvider}
+                    onProviderError={setShowProviderError}
                   />
                 )
               )}

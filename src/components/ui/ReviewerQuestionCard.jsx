@@ -12,7 +12,9 @@ const QuestionCard = ({
   setAssignStatus,
   selectedReviewers,
   setSelectedReviewers,
-  onAssignmentComplete
+  onAssignmentComplete,
+  provider,
+  onProviderError
 }) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -72,7 +74,12 @@ const QuestionCard = ({
             }`}
         >
           {isReviewerMode ? (
-            <ReviewerAnswerEditor question={question} isDarkMode={isDarkMode} />
+            <ReviewerAnswerEditor 
+              question={question} 
+              isDarkMode={isDarkMode} 
+              provider={provider}
+              onProviderError={onProviderError}
+            />
           ) : isAdminMode ? (
             <AssignmentControls
               question={question}
