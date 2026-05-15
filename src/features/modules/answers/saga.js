@@ -76,15 +76,16 @@ function* generateAnswerWorker(action) {
     // Show success toast
     toast.success("Answer generated successfully!");
   } catch (error) {
+    const errorMessage = error.response?.data?.message || error.response?.data?.detail || error.message || "Failed to generate answer. Please try again.";
     yield put(
       generateAnswerFailure({
         questionId,
-        error: error.response?.data?.detail || error.message,
+        error: errorMessage,
       })
     );
 
     // Show error toast
-    toast.error("Failed to generate answer. Please try again.");
+    toast.error(errorMessage);
   }
 }
 
